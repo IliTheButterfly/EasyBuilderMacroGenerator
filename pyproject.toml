@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eb_macro_gen"
+version = "0.0.1"
+authors = [
+  { name="IliTheButterfly", email="iliana.decarufel@gmail.com" },
+]
+description = "An API to allow generating EasyBuilder Pro macros"
+readme = "ReadMe.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICENSE*"]
+dependencies = [
+    "pyperclip"
+]
+
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/*",
+]
+
+[project.urls]
+Homepage = "https://github.com/IliTheButterfly/EasyBuilderMacroGnerator"
+Issues = "https://github.com/IliTheButterfly/EasyBuilderMacroGnerator/issues"

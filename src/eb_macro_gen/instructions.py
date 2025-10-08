@@ -1,5 +1,6 @@
 from __future__ import annotations
-from syntax import *
+from typing import Tuple
+from .syntax import *
 
 def ACOS(source:AnyVariable[DT], result:AnyVariable[DT]) -> CALL:
     """
@@ -140,7 +141,7 @@ ASYNC_TRIG_MACRO("check_status")
 //  if the name of macro 5 is "check_status", MACRO 5 will be triggered.
 ```
     """
-    return CALL('ASYNC_TRIG_MACRO', macro)
+    return CALL('ASYNC_TRIG_MACRO', ensure_string_is_literal(macro))
 
 def ATAN(source:AnyVariable[DT], result:AnyVariable[DT]) -> CALL:
     """
@@ -488,7 +489,9 @@ DATE2ASCII(5, result[0], 10, "-")
 //  result[0]~[9] == "2019-02-16"//  today is 2019/02/11
 ```
     """
-    return CALL('DATE2ASCII', day_offset, start, count, separator)
+    if len(separator) > 1:
+        raise ValueError("Separator must be of length 1")
+    return CALL('DATE2ASCII', day_offset, start, count, f"'{separator}'")
 
 def DATE2DEC(day_offset:AnyInt, date:AnyVariable[int]) -> CALL:
     """
@@ -553,7 +556,7 @@ result = RecipeGetData(str[0], "TypeB.item_name", recordID)
 // get data from recipe "TypeB", where item name is "item_name" and the record ID is 1.
 ```
     """
-    return CALL('RecipeGetData', destination, recipe_address, record_id)
+    return CALL('RecipeGetData', destination, ensure_string_is_literal(recipe_address), record_id)
 
 def RecipeQuery(query:Union[str, VariableItem[int], LITERAL], destination:AnyVariable) -> EVAL:
     """
@@ -578,7 +581,7 @@ result = RecipeQuery(sql[0], total_row)
 // Query "TypeB". The total number of rows of query result is written to total_row.
 ```
     """
-    return EVAL('RecipeQuery', query, destination)
+    return EVAL('RecipeQuery', ensure_string_is_literal(query), destination)
 
 def RecipeQueryGetData(destination:AnyVariable, recipe_address:Union[str, LITERAL], result_row:AnyVariable[int]) -> EVAL:
     """
@@ -607,7 +610,7 @@ if (result_query) then
 end if
 ```
     """
-    return EVAL('RecipeQueryGetData', destination, recipe_address, result_row)
+    return EVAL('RecipeQueryGetData', destination, ensure_string_is_literal(recipe_address), result_row)
 
 def RecipeQueryGetRecordID(destination:AnyVariable[int], result_row:AnyVariable[int]) -> EVAL:
     """
@@ -663,7 +666,7 @@ result = RecipeSetData(str[0], "TypeB.item_name", recordID)
 // set data to recipe "TypeB", where item name is "item_name" and the record ID is 1.
 ```
     """
-    return EVAL('RecipeSetData', source, recipe_address, record_id)
+    return EVAL('RecipeSetData', source, ensure_string_is_literal(recipe_address), record_id)
 
 def RecipeTransactionBegin() -> CALL:
     """
@@ -733,7 +736,7 @@ SYNC_TRIG_MACRO("check_status")
 //  if the name of macro 5 is "check_status", MACRO 5 will be triggered.
 ```
     """
-    return CALL('SYNC_TRIG_MACRO', macro)
+    return CALL('SYNC_TRIG_MACRO', ensure_string_is_literal(macro))
 
 def TRACE(fmt:Union[str, LITERAL], *values:AnyValue) -> CALL:
     """
@@ -750,7 +753,7 @@ int a = 100
 TRACE(" a = %d", a)
 ```
     """
-    return CALL('TRACE', fmt, *values)
+    return CALL('TRACE', string_literal(fmt), *[ensure_string_is_literal(v) for v in values])
     
 def INFO(fmt:str, *values:AnyValue) -> CALL:
     """
@@ -820,7 +823,7 @@ ERROR(" a = %d", a)
     """
     return TRACE("[ERROR] " + fmt, *values)
 
-def SetData(send_data:AnyVariable, device_name:str, address_name:str, data_count:AnyInt = 1) -> CALL:
+def SetData(send_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Write data to a device and stop script execution if no response from this device.
@@ -842,9 +845,9 @@ SetData(wData[0], "Local HMI", "Pressure", 6
 //  use user-defined tag - "Pressure" to indicate device type and address.
 ```
     """
-    return CALL('SetData', send_data, device_name, address_name, data_count)
+    return CALL('SetData', send_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
-def SetDataEx(send_data:AnyVariable, device_name:str, address_name:str, data_count:AnyInt = 1) -> CALL:
+def SetDataEx(send_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Write data to a device and continue executing next command
@@ -867,9 +870,9 @@ SetDataEx(wData[0], "Local HMI", "Pressure", 6
 //  use user-defined tag - "Pressure" to indicate device type and address.
 ```
     """
-    return CALL('SetDataEx', send_data, device_name, address_name, data_count)
+    return CALL('SetDataEx', send_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
-def GetData(read_data:AnyVariable, device_name:str, address_name:str, data_count:AnyInt = 1) -> CALL:
+def GetData(read_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Read data from a device.
@@ -888,9 +891,9 @@ GetData(wData[0], "Local HMI", "Pressure", 6)
 //  use user-defined tag - "Pressure" to indicate device type and address.
 ```
     """
-    return CALL('GetData', read_data, device_name, address_name, data_count)
+    return CALL('GetData', read_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
-def GetDataEx(read_data:Variable, device_name:str, address_name:str, data_count:AnyInt = 1) -> CALL:
+def GetDataEx(read_data:Variable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Read data from a device and continue executing next command
@@ -920,7 +923,7 @@ if err == 0 then
 end if
 ```
     """
-    return CALL('GetDataEx', read_data, device_name, address_name, data_count)
+    return CALL('GetDataEx', read_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
 def GetError(error:AnyVariable[int]) -> CALL:
     """

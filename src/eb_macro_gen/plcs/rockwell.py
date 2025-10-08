@@ -1,5 +1,5 @@
 from __future__ import annotations
-from hmi_instructions import *
+from eb_macro_gen.instructions import *
 
 class TON(STATEMENT):
     def __init__(self, timer:TIMER):

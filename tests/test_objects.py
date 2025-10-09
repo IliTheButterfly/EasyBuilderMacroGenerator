@@ -20,7 +20,7 @@ def test_routine():
     macro.display()
     
 def test_some_func():
-    macro = Macro("test_some_func", "Test the routine Statement")
+    macro = Macro("test_some_func", "Test a simple start/stop logic")
     
     macro.begin()
     motor_tag = Tag("motor_tag", "Local HMI", "LB, 7000", DataType.Bit)
@@ -116,5 +116,25 @@ def test_indirect_tag():
         indirect.write_to_indirect(),
     )
     
+    macro.end()
+    macro.display()
+    
+def test_scheduler():
+    macro = Macro("test_scheduler", "Test the scheduler object")
+    
+    macro.begin()
+    task1_tag = Tag("task1_tag", "Local HMI", "LB, 10", DataType.Bit)
+    task2_tag = Tag("task2_tag", "Local HMI", "LB, 11", DataType.Bit)
+    
+    macro.write(
+        SCHEDULER(
+            TASK("task1", task1_tag,
+                INFO("Task1"),
+            ),
+            TASK("task2", task2_tag,
+                INFO("Task2"),
+            ),
+        )
+    )
     macro.end()
     macro.display()

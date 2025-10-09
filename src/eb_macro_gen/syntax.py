@@ -589,6 +589,8 @@ class Variable(Resource, Generic[DT]):
     def declare(self) -> str:
         if self.default is None:
             return f'{self.dtype} {self.name}'
+        elif isinstance(self.default, bool):
+            self.default = 1 if self.default else 0
         return f'{self.dtype} {self.name} = {self.default}'
     
     @overload

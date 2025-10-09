@@ -95,7 +95,7 @@ class TASK(STATEMENT):
         super().__init__(command_tag, body)
         self.name = name
         self.command_tag = command_tag
-        self.command_var = vbool("_task_cmd", False)
+        self.command_var = vbool("p_task_cmd", False)
         self.body = BLOCK(
             COMMENT(f"========== START TASK {name} =========="),
             self.command_tag.read(self.command_var),
@@ -108,9 +108,10 @@ class TASK(STATEMENT):
             ),
             COMMENT(f"========== END TASK {name} =========="),
         )
-        
-    def __str__(self) -> str:
-        return str(self.body)
+        self.resources.append(self.body)
+    
+    def bake(self, macro:Macro):
+        self.body.bake(macro)
     
     def enable(self) -> STATEMENT:
         return self.command_tag.write(ON)
@@ -119,7 +120,7 @@ class TASK(STATEMENT):
         return self.command_tag.write(OFF)
     
 class SCHEDULER(STATEMENT):
-    done_var = vbool("_scheduler_done", False)
+    done_var = vbool("p_scheduler_done", False)
     def __init__(self, *tasks:TASK):
         super().__init__(*tasks)
         self.tasks:Dict[str, TASK] = {task.name : task for task in tasks}
@@ -133,6 +134,11 @@ class SCHEDULER(STATEMENT):
             ) for task in self.tasks.values()],
             COMMENT("********** END SCHEDULER **********"),
         )
+        self.resources.append(self.body)
+        
+    def bake(self, macro:Macro):
+        self.body.bake(macro)
+    
 
 class INDIRECT_TAG(Resource):
     def __init__(self, indirect_tag:Tag, indirect_var:AnyVariable, actual_tags:List[Tag]):

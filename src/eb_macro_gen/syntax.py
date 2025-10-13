@@ -15,12 +15,18 @@ See https://github.com/IliTheButterfly/EasyBuilderMacroGenerator"""
 
 
 class Resource:
+    ID_COUNT = 0
     def __init__(self, *resources:Resource):
-        self.resources:List[Resource] = list(resources)
+        self.resources:Set[Resource] = set(resources)
+        self._id = Resource.ID_COUNT
+        Resource.ID_COUNT += 1
     def process(self, macro:Macro) -> None:
         for r in self.resources:
             if isinstance(r, Resource) and not r.__class__ is Resource:
                 r.process(macro)
+                
+    def __hash__(self) -> int:
+        return hash(self._id)
     
 class STATEMENT(Resource):
     def __init__(self, *resources:Resource):
@@ -362,7 +368,7 @@ class CASE(Resource):
     
     def __call__(self, *body:STATEMENT) -> CASE_CONTENT:
         res = CASE_CONTENT(self.match, *body)
-        self.resources.append(res)
+        self.resources.add(res)
         return res
     
 class SWITCH(Resource):
@@ -401,7 +407,7 @@ class EXPRESSION(Resource):
         return LITERAL(f'{self} == {o}')
     
     def __eq__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self} == {str(o)}')
     
     @overload
@@ -409,7 +415,7 @@ class EXPRESSION(Resource):
         return LITERAL(f'{self} <> {o}')
     
     def __ne__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self} <> {str(o)}')
     
     @overload
@@ -417,7 +423,7 @@ class EXPRESSION(Resource):
         return LITERAL(f'{self} < {o}')
     
     def __lt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self} < {str(o)}')
 
     @overload
@@ -425,7 +431,7 @@ class EXPRESSION(Resource):
         return LITERAL(f'{self} <= {o}')
     
     def __le__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self} <= {str(o)}')
     
     @overload
@@ -433,7 +439,7 @@ class EXPRESSION(Resource):
         return LITERAL(f'{self} > {o}')
     
     def __gt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self} > {str(o)}')
     
     @overload
@@ -441,7 +447,7 @@ class EXPRESSION(Resource):
         return LITERAL(f'{self} >= {o}')
     
     def __ge__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self} >= {str(o)}')
     
     def __and__(self, o:Union[EXPRESSION, Variable[bool], VariableItem[bool]]) -> AND:
@@ -455,30 +461,30 @@ class EXPRESSION(Resource):
     
     def __sub__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} - {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __add__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} + {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __mul__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} * {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __truediv__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} / {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __str__(self) -> str: ...
@@ -490,7 +496,7 @@ class EVAL(EXPRESSION):
         self.params:List[Union[Variable, VariableItem, bool, int, float, str]] = list([*params])
         for p in self.params:
             if isinstance(p, Resource):
-                self.resources.append(p)
+                self.resources.add(p)
     
     def __str__(self) -> str:
         return f'{self.funcName}({", ".join([str(p) for p in self.params])})'
@@ -540,7 +546,7 @@ class OR(EXPRESSION):
     
     def append(self, *expressions:EXPRESSION):
         self._expressions.extend(expressions)
-        self.resources.extend(expressions)
+        self.resources.update(expressions)
         
     def __str__(self):
         return f'({" or ".join([str(e) for e in self._expressions])})'
@@ -562,7 +568,7 @@ class AND(EXPRESSION):
         
     def append(self, *expressions:EXPRESSION):
         self._expressions.extend(expressions)
-        self.resources.extend(expressions)
+        self.resources.update(expressions)
         
     def __str__(self):
         return f'({" and ".join([str(e) for e in self._expressions])})'
@@ -583,7 +589,7 @@ class Variable(Resource, Generic[DT]):
         
     def as_literal(self) -> LITERAL:
         res = LITERAL(str(self))
-        res.resources.append(self)
+        res.resources.add(self)
         return res
         
     def declare(self) -> str:
@@ -598,7 +604,7 @@ class Variable(Resource, Generic[DT]):
         return LITERAL(f'{self.name} == {o}')
     
     def __eq__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.name} == {str(o)}')
     
     @overload
@@ -606,7 +612,7 @@ class Variable(Resource, Generic[DT]):
         return LITERAL(f'{self.name} <> {o}')
     
     def __ne__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.name} <> {str(o)}')
     
     @overload
@@ -614,7 +620,7 @@ class Variable(Resource, Generic[DT]):
         return LITERAL(f'{self.name} < {o}')
     
     def __lt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.name} < {str(o)}')
 
     @overload
@@ -622,7 +628,7 @@ class Variable(Resource, Generic[DT]):
         return LITERAL(f'{self.name} <= {o}')
     
     def __le__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.name} <= {str(o)}')
     
     @overload
@@ -630,7 +636,7 @@ class Variable(Resource, Generic[DT]):
         return LITERAL(f'{self.name} > {o}')
     
     def __gt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.name} > {str(o)}')
     
     @overload
@@ -638,7 +644,7 @@ class Variable(Resource, Generic[DT]):
         return LITERAL(f'{self.name} >= {o}')
     
     def __ge__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.name} >= {str(o)}')
     
     def __and__(self, o:Union[EXPRESSION, Variable[bool], VariableItem[bool]]) -> AND:
@@ -652,30 +658,30 @@ class Variable(Resource, Generic[DT]):
     
     def __sub__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} - {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __add__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} + {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __mul__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} * {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __truediv__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} / {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
 
     def set(self, o:Union[Variable, VariableItem, EXPRESSION, bool, int, float, str]) -> ASSIGNEMENT:
@@ -694,7 +700,7 @@ class VariableItem(Resource, Generic[DT]):
         self.array = array
         self.index = index
         if isinstance(self.index, Resource):
-            self.resources.append(self.index)
+            self.resources.add(self.index)
         
     def process(self, macro:Macro) -> None:
         Resource.process(self, macro)
@@ -702,7 +708,7 @@ class VariableItem(Resource, Generic[DT]):
         
     def as_literal(self) -> LITERAL:
         res = LITERAL(str(self))
-        res.resources.append(self)
+        res.resources.add(self)
         return res
         
     @overload
@@ -710,7 +716,7 @@ class VariableItem(Resource, Generic[DT]):
         return LITERAL(f'{self.array.name} == {o}')
     
     def __eq__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.array.name} == {str(o)}')
     
     @overload
@@ -718,7 +724,7 @@ class VariableItem(Resource, Generic[DT]):
         return LITERAL(f'{self.array.name} <> {o}')
     
     def __ne__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.array.name} <> {str(o)}')
     
     @overload
@@ -726,7 +732,7 @@ class VariableItem(Resource, Generic[DT]):
         return LITERAL(f'{self.array.name} < {o}')
     
     def __lt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.array.name} < {str(o)}')
 
     @overload
@@ -734,7 +740,7 @@ class VariableItem(Resource, Generic[DT]):
         return LITERAL(f'{self.array.name} <= {o}')
     
     def __le__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.array.name} <= {str(o)}')
     
     @overload
@@ -742,7 +748,7 @@ class VariableItem(Resource, Generic[DT]):
         return LITERAL(f'{self.array.name} > {o}')
     
     def __gt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.array.name} > {str(o)}')
     
     @overload
@@ -750,7 +756,7 @@ class VariableItem(Resource, Generic[DT]):
         return LITERAL(f'{self.array.name} >= {o}')
     
     def __ge__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        self.resources.append(o)
+        self.resources.add(o)
         return LITERAL(f'{self.array.name} >= {str(o)}')
     
     def __and__(self, o:Union[EXPRESSION, VariableItem[bool], Variable[bool]]) -> AND:
@@ -764,30 +770,30 @@ class VariableItem(Resource, Generic[DT]):
     
     def __sub__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} - {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __add__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} + {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __mul__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} * {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
     
     def __truediv__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} / {str(o)}')
-        res.resources.append(self)
+        res.resources.add(self)
         if isinstance(o, Resource):
-            res.resources.append(o)
+            res.resources.add(o)
         return res
 
     def set(self, o:AnyValue) -> ASSIGNEMENT:
@@ -810,7 +816,7 @@ class VariableArray(Resource, Generic[DT]):
         
     def as_literal(self) -> LITERAL:
         res = LITERAL(str(self))
-        res.resources.append(self)
+        res.resources.add(self)
         return res
         
     def declare(self) -> str:
@@ -866,9 +872,11 @@ class BlockType(Enum):
     MACRO_BLOCK = 3
 
 class Macro:
-    def __init__(self, name:str, description:str):
+    def __init__(self, name:str, description:Optional[str]=None):
         self.name = name
         self.description = description
+        if self.description is None:
+            self.description = ""
         self.indentation = 0
         self._maxlen = 200
         self.statements:List[STATEMENT] = []
@@ -876,6 +884,13 @@ class Macro:
         self.variables:Set[Variable, VariableArray] = set()
         self._nest:deque[BlockType] = deque()
         self._variable_block = VARIABLE_BLOCK()
+    
+    def __enter__(self) -> Macro:
+        self.begin()
+        return self
+    
+    def __exit__(self, _, __, ___):
+        self.end()
     
     @overload
     def add_variable(self, var:Variable[DT]) -> Variable[DT]:

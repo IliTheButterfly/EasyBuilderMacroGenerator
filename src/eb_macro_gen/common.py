@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Generic, Hashable, List, Optional, TypeVar, Union
 
 TK1_ = TypeVar("TK1_", bound=Hashable)
@@ -29,9 +30,9 @@ class DoubleKeyMap(Generic[TK1_, TK2_, TV_]):
                 break
             
         if idx is not None:
-            self.keys1.remove(idx)
-            self.keys2.remove(idx)
-            self.values.remove(idx)
+            del self.keys1[idx]
+            del self.keys2[idx]
+            del self.values[idx]
             
     def remove_from_key2(self, key:TK2_):
         kh = hash(key)
@@ -42,20 +43,20 @@ class DoubleKeyMap(Generic[TK1_, TK2_, TV_]):
                 break
             
         if idx is not None:
-            self.keys1.remove(idx)
-            self.keys2.remove(idx)
-            self.values.remove(idx)
+            del self.keys1[idx]
+            del self.keys2[idx]
+            del self.values[idx]
         
     def get_from_key1(self, key:TK1_) -> Optional[TV_]:
         kh = hash(key)
-        for i, k in self.keys1:
+        for i, k in enumerate(self.keys1):
             if hash(k) == kh:
                 return self.values[i]
         return None
     
     def get_from_key2(self, key:TK2_) -> Optional[TV_]:
         kh = hash(key)
-        for i, k in self.keys2:
+        for i, k in enumerate(self.keys2):
             if hash(k) == kh:
                 return self.values[i]
         return None
@@ -104,13 +105,21 @@ def smart_split(text: str, sep: str = ',') -> list[str]:
         cleaned.append(part)
     return cleaned
 
-def prompt_yna(prompt:str) -> Optional[bool]:
+class PromptResult(Enum):
+    YES = 0
+    NO = 1
+    ALL = 2
+    NONE = 3
+
+def prompt_yna(prompt:str) -> PromptResult:
     while True:
-        v = input(prompt)
-        if v.lower() == 'y':
-            return True
-        if v.lower() == 'n':
-            return False
-        if v.lower() == 'a':
-            return None
+        v = input(f"{prompt} (y[es], n[o], a[ll], none)")
+        if v.lower().startswith('none'):
+            return PromptResult.NONE
+        if v.lower().startswith('y'):
+            return PromptResult.YES
+        if v.lower().startswith('n'):
+            return PromptResult.NO
+        if v.lower().startswith('a'):
+            return PromptResult.ALL
         print("Invalid input.")

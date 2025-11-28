@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
 
 from typing import Generic, Hashable, List, Optional, TypeVar, Union
-from eb_macro_gen.common import DoubleKeyMap, smart_split, prompt_yna
+from eb_macro_gen.common import DoubleKeyMap, PromptResult, smart_split, prompt_yna
 from eb_macro_gen.objects import EasyBuilderTag, EasyBuilderTagList
 from eb_macro_gen.plcs.koyo import KoyoTag, KoyoTagList, KOYO_EB_TYPE_MAP
     
@@ -47,7 +47,10 @@ def main(argv:List[str]):
     with koyo_file.open('r') as rd:
         koyoTags.read(rd)
             
-    replace_all = False
+    replace_all_tags = False
+    replace_no_tags = False
+    replace_all_names = False
+    replace_no_names = False
     for _, __, tag in iter(koyoTags.map):
         tag:KoyoTag
         register = ''.join(filter(lambda c: c.isalpha(), tag.Address))
@@ -55,19 +58,29 @@ def main(argv:List[str]):
         newTag = EasyBuilderTag(tag.Nickname, koyo_name, f"{register},{address}", tag.AddressComment, KOYO_EB_TYPE_MAP[tag.Data])
         if newTag in ebTags:
             if newTag.Name in ebTags.map:
-                r = replace_all or prompt_yna(f"A tag with the name '{newTag.Name}' already exists. Replace it? (y/n/a [all])")
-                if r is None:
-                    replace_all = True
-                    r = True
-                if r:
-                    ebTags.map.remove_from_key1(newTag.Name)
+                e = False
+                if not (replace_all_names or replace_no_names):
+                    r = prompt_yna(f"A tag with the name '{newTag.Name}' already exists. Replace it?")
+                    if r == PromptResult.ALL:
+                        replace_all_names = True
+                    if r == PromptResult.NONE:
+                        replace_no_names = True
+                    if r == PromptResult.YES:
+                        e = True
+                if (e or replace_all_names) and not replace_no_names:
+                    ebTags.map.remove_from_key2(newTag.Name)
             if f"{newTag.Address},{newTag.Host}" in ebTags.map:
-                r = replace_all or prompt_yna(f"A tag with the address '{newTag.Address},{newTag.Host}' already exists. Replace it? (y/n/a [all])")
-                if r is None:
-                    replace_all = True
-                    r = True
-                if r:
-                    ebTags.map.remove_from_key2(f"{newTag.Address},{newTag.Host}")
+                e = False
+                if not (replace_all_tags or replace_no_tags):
+                    r = prompt_yna(f"A tag with the address '{newTag.Address},{newTag.Host}' already exists. Replace it ({ebTags.map.get_from_key1(f"{newTag.Address},{newTag.Host}").Name} -> {newTag.Name})?")
+                    if r == PromptResult.ALL:
+                        replace_all_tags = True
+                    if r == PromptResult.NONE:
+                        replace_no_tags = True
+                    if r == PromptResult.YES:
+                        e = True
+                if (e or replace_all_tags) and not replace_no_tags:
+                    ebTags.map.remove_from_key1(f"{newTag.Address},{newTag.Host}")
         if ebTags.add(newTag):
             print(f"Added {repr(newTag)}")
         else:

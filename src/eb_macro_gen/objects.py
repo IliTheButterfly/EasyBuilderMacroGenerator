@@ -181,6 +181,10 @@ class EasyBuilderTagList(TagList[EasyBuilderTag]):
             values = smart_split(l)
             tag = EasyBuilderTag(values[0], values[1], f"{values[2]},{values[3]}", values[4], values[5])
             self.add(tag)
+            
+    def write(self, stream:IO):
+        for _, __, tag in self.map:
+            stream.write(f"{tag.export()}\n")
     
 class ROUTINE(BLOCK):
     def __init__(self, name:str, step_tag:Tag, steps:List[STATEMENT]):

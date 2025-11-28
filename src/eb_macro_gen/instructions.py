@@ -893,7 +893,7 @@ GetData(wData[0], "Local HMI", "Pressure", 6)
     """
     return CALL('GetData', read_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
-def GetDataEx(read_data:Variable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
+def GetDataEx(read_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Read data from a device and continue executing next command

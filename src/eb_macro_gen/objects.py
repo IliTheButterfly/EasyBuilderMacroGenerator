@@ -1,6 +1,9 @@
 from __future__ import annotations
-from typing import Dict
-from src.eb_macro_gen.instructions import *
+from abc import abstractmethod
+from typing import IO, Dict, override
+from .instructions import *
+from .common import DoubleKeyMap, smart_split
+from dataclasses import dataclass
 
 class DataType(Enum):
     Bit = 0
@@ -15,6 +18,77 @@ class DataType(Enum):
     S64 = 9
     F32 = 10
     F64 = 11
+    
+DT_EB_MAP:Dict[DataType, str] = {
+    DataType.Bit : "",
+    DataType.Undesignated : "Undesignated",
+    DataType.BCD16 : "16-bit BCD",
+    DataType.BCD32 : "32-bit BCD",
+    DataType.U16 : "16-bit Unsigned",
+    DataType.S16 : "16-bit Signed",
+    DataType.U32 : "32-bit Unsigned",
+    DataType.S32 : "16-bit Signed",
+    DataType.F32 : "32-bit Float",
+}
+
+EB_DT_MAP:Dict[str, DataType] = {
+    "" : DataType.Bit,
+    "Undesignated" : DataType.Undesignated,
+    "16-bit BCD" : DataType.BCD16,
+    "32-bit BCD" : DataType.BCD32,
+    "16-bit Unsigned" : DataType.U16,
+    "16-bit Signed" : DataType.S16,
+    "32-bit Unsigned" : DataType.U32,
+    "16-bit Signed" : DataType.S32,
+    "32-bit Float" : DataType.F32,
+}
+    
+def is_int(v:Union[DataType, str, Variable, VariableItem, Tag, int]) -> bool:
+    if isinstance(v, DataType):
+        match v:
+            case DataType.BCD16:
+                return True
+            case DataType.BCD32:
+                return True
+            case DataType.U16:
+                return True
+            case DataType.S16:
+                return True
+            case DataType.U32:
+                return True
+            case DataType.S32:
+                return True
+            case DataType.U64:
+                return True
+            case DataType.S64:
+                return True
+            case _:
+                return False
+    if isinstance(v, str):
+        return "char" in v or "short" in v or "int" in v or "long" in v
+    if isinstance(v, (Variable, VariableItem)):
+        return is_int(v.dtype)
+    if isinstance(v, Tag):
+        return is_int(v.dtype)
+    return isinstance(v, int)
+
+    
+def is_float(v:Union[DataType, str, Variable, VariableItem, Tag, float]) -> bool:
+    if isinstance(v, DataType):
+        match v:
+            case DataType.F32:
+                return True
+            case DataType.F64:
+                return True
+            case _:
+                return False
+    if isinstance(v, str):
+        return "float" in v or "double" in v
+    if isinstance(v, (Variable, VariableItem)):
+        return is_float(v.dtype)
+    if isinstance(v, Tag):
+        return is_float(v.dtype)
+    return isinstance(v, float)
     
 class Tag(Resource):
     def __init__(self, name:str, device_name:str, address:str, dtype:DataType):
@@ -56,6 +130,57 @@ class Tag(Resource):
     
     def __hash__(self) -> int:
         return hash(f"{self.device_name}/{self.address}")
+    
+_TT = TypeVar("_TT")
+class TagList(Generic[_TT]):
+    @abstractmethod
+    def add(self, tag:_TT) -> bool: ...
+    
+    @abstractmethod
+    def __contains__(self, tag:_TT) -> bool: ...
+    
+    @abstractmethod
+    def read(self, stream:IO):...
+    
+@dataclass
+class EasyBuilderTag:
+    Name:str
+    Host:str
+    Address:str
+    Comment:str
+    Type:str
+    
+    def to_tag(self) -> Tag:
+        return Tag(self.Name, self.Host, self.Address, EB_DT_MAP[self.Type])
+    
+    def export(self) -> str:
+        comment = self.Comment
+        comment.replace('"', '""')
+        if ',' in comment:
+            comment = '"' + comment + '"'
+        return f"{self.Name},{self.Host},{self.Address},{comment},{self.Type}"
+    
+class EasyBuilderTagList(TagList[EasyBuilderTag]):
+    def __init__(self):
+        super().__init__()
+        self.map:DoubleKeyMap[str, str, EasyBuilderTag] = DoubleKeyMap()
+        
+    @override
+    def add(self, tag:EasyBuilderTag) -> bool:
+        return self.map.add(f"{tag.Address},{tag.Host}", tag.Name, tag)
+    
+    @override
+    def __contains__(self, tag:EasyBuilderTag) -> bool:
+        if not isinstance(tag, EasyBuilderTag):
+            return False
+        return f"{tag.Address},{tag.Host}" in self.map or tag.Name in self.map
+
+    @override
+    def read(self, stream:IO):
+        for l in stream.readlines():
+            values = smart_split(l)
+            tag = EasyBuilderTag(values[0], values[1], f"{values[2]},{values[3]}", values[4], values[5])
+            self.add(tag)
     
 class ROUTINE(BLOCK):
     def __init__(self, name:str, step_tag:Tag, steps:List[STATEMENT]):

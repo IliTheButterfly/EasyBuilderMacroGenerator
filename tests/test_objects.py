@@ -273,12 +273,13 @@ def test_drawing():
         step_tag = Tag("step", "Local HMI", "LW, 49", DataType.U16)
         
         line1_enable_tag = Tag("line1_en", "Local HMI", "LB, 41", DataType.Bit)
-        line2_enable_tag = Tag("line2_en", "Local HMI", "LB, 42", DataType.Bit)
         line1_x1_tag = Tag("line1_x1", "Local HMI", "LW, 150", DataType.U16)
+        line2_x1_tag = Tag("line1_x1", "Local HMI", "LW, 152", DataType.F32)
         
-        drawing = DRAWING("my_drawing", reset_tag, shape_tag, step_tag)
+        drawing = DRAWING("my_drawing", reset_tag, shape_tag, step_tag, 310, 260)
         drawing.add(LINE(line1_enable_tag, line1_x1_tag, 10, 10, 50, ArrowStyle.LARGE_TWO_SOLID, LineStyle.DASH, 0))
-        drawing.add(LINE(line2_enable_tag, 5, 5, 15, 20, ArrowStyle.ONE_HOLLOW, LineStyle.DASH_DOT_DOT, 3))
+        drawing.add(LINE(True, line2_x1_tag, 5, 0.5, 50, ArrowStyle.ONE_HOLLOW, LineStyle.DASH_DOT_DOT, 6))
+        drawing.add(CIRCLE(True, line1_x1_tag, 10, 10, ShapeStyle.SOLID, 6, 3, 2))
         macro.write(
             drawing.routine,
         )
@@ -286,4 +287,53 @@ def test_drawing():
         drawing.routine.loop_macro(macro.name).display()
     
     macro.display()
-        
+
+def test_create_tags():
+    macro = Macro("heat_cool_states", "Converts the heating and cooling conditions into a word")
+    
+    PLC_NAME = "KOYO CLICK (Ethernet)"
+    LOCAL_HMI = "Local HMI"
+    
+    with macro:
+        steam_in = vbool("steam_in", False)
+        steam_out = vbool("steam_out", False)
+        cool_in = vbool("cool_in", False)
+        cool_out = vbool("cool_out", False)
+        steam_present = vbool("steam_present", False)
+        water_present = vbool("water_present", False)
+        jacket_state = vint("jacket_state", 0)
+        for i in range(1, 4):
+            steam_in_tag = Tag(f"F33_J{i}_steam_in", PLC_NAME, string_literal(f"F33_J{i}_steam_in"), DataType.Bit)
+            steam_out_tag = Tag(f"F33_J{i}_steam_out", PLC_NAME, string_literal(f"F33_J{i}_steam_out"), DataType.Bit)
+            cool_in_tag = Tag(f"F33_J{i}_cool_in", PLC_NAME, string_literal(f"F33_J{i}_cool_in"), DataType.Bit)
+            cool_out_tag = Tag(f"F33_J{i}_cool_out", PLC_NAME, string_literal(f"F33_J{i}_cool_out"), DataType.Bit)
+            steam_present_tag = Tag(f"F33_J{i}_steam_present", PLC_NAME, string_literal(f"F33_J{i}_steam_present"), DataType.Bit)
+            water_present_tag = Tag(f"F33_J{i}_water_present", PLC_NAME, string_literal(f"F33_J{i}_water_present"), DataType.Bit)
+            jacket_state_tag = Tag(f"F33_J{i}_state", LOCAL_HMI, string_literal(f"F33_J{i}_state"), DataType.Bit)
+            
+            macro.write(
+                COMMENT(f"Jacket {i}"),
+                COMMENT("Read tags"),
+                steam_in_tag.read(steam_in),
+                steam_out_tag.read(steam_out),
+                cool_in_tag.read(cool_in),
+                cool_out_tag.read(cool_out),
+                steam_present_tag.read(steam_present),
+                water_present_tag.read(water_present),
+                EMPTY(),
+                COMMENT("0: Empty, 1: Steam present, 2: Heating, 3: Water present, 4: Cooling"),
+                jacket_state.set(0),
+                IF(steam_in & steam_out)(
+                    jacket_state.set(2),
+                ).ELIF(steam_present)(
+                    jacket_state.set(1),
+                ).ELIF(cool_in & cool_out)(
+                    jacket_state.set(4),
+                ).ELIF(water_present)(
+                    jacket_state.set(3),
+                ),
+                EMPTY(),
+                COMMENT("Write tag"),
+                jacket_state_tag.write(jacket_state),
+            )
+    macro.display()

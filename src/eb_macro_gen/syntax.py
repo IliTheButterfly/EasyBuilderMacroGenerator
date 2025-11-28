@@ -17,7 +17,7 @@ See https://github.com/IliTheButterfly/EasyBuilderMacroGenerator"""
 class Resource:
     ID_COUNT = 0
     def __init__(self, *resources:Resource):
-        self.resources:Set[Resource] = set(resources)
+        self.resources:Set[Resource] = set(filter(lambda x: isinstance(x, Resource), resources))
         self._id = Resource.ID_COUNT
         Resource.ID_COUNT += 1
     def process(self, macro:Macro) -> None:
@@ -990,6 +990,7 @@ class Macro:
             print(l, end='')
             
     def clipboard(self):
+        import pyperclip
         self.result = ['']
         for s in self.statements:
             s.process(self)

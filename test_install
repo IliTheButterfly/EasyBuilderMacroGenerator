@@ -1,0 +1,20 @@
+#!/usr/bin/bash
+
+# Stop on error
+set -e
+
+# Remove venv
+rm -rf test_venv
+
+# Add venv
+python -m venv test_venv
+. ./test_venv/bin/activate
+
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install the library
+pip install https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
+
+# Run code to test
+python ./examples/simple.py

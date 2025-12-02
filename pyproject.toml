@@ -19,7 +19,7 @@ license = "MIT"
 license-files = ["LICENSE*"]
 dependencies = [
     "pyperclip",
-    "sqlite3"
+    "db-sqlite3"
 ]
 
 

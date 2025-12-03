@@ -262,6 +262,30 @@ def test_recursive_task():
     macro2.end()
     macro2.display()
     
+def test_c_ifs():
+    macro = Macro("test_c_ifs")
+    
+    with macro:
+        var1 = vint("var1")
+
+        for i in range(10):
+            if i == 0:
+                macro.write(
+                    C_IF(var1 == i),
+                )
+            else:
+                macro.write(
+                    C_ELIF(var1 == i),
+                )
+            macro.write(
+                COMMENT(f"Case {i}"),
+            )
+        macro.write(
+            C_ELSE(),
+            COMMENT("Case Else"),
+            C_END_IF(),
+        )
+    macro.display()
     
 def test_drawing():
     macro = Macro("test_drawing")

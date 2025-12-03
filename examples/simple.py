@@ -158,7 +158,7 @@ end macro_command
                     COMMENT("Read command from HMI"),
                     valve_cmd_ind.read(valve_cmd_value),
                     COMMENT("Write command to PLC"),
-                    valve_cmd.write(valve_cmd_ind),
+                    valve_cmd.write(valve_cmd_value),
                 ),
                 EMPTY(),
             )
@@ -171,8 +171,8 @@ end macro_command
 
 // A more complex use of a macro
 macro_command main()
-    bool valve_cmd_value
     bool selected
+    bool valve_cmd_value
     
     // V200 selected
     
@@ -182,7 +182,7 @@ macro_command main()
         // Read command from HMI
         GetData(valve_cmd_value, "Local HMI", "valve_cmd_ind", 1)
         // Write command to PLC
-        SetData(<eb_macro_gen.objects.Tag object at 0x7f0588e94b00>, "My PLC", "V200_cmd", 1)
+        SetData(valve_cmd_value, "My PLC", "V200_cmd", 1)
     end if
     
     // V201 selected
@@ -193,7 +193,7 @@ macro_command main()
         // Read command from HMI
         GetData(valve_cmd_value, "Local HMI", "valve_cmd_ind", 1)
         // Write command to PLC
-        SetData(<eb_macro_gen.objects.Tag object at 0x7f0588e94b00>, "My PLC", "V201_cmd", 1)
+        SetData(valve_cmd_value, "My PLC", "V201_cmd", 1)
     end if
     
     // V300 selected
@@ -204,7 +204,7 @@ macro_command main()
         // Read command from HMI
         GetData(valve_cmd_value, "Local HMI", "valve_cmd_ind", 1)
         // Write command to PLC
-        SetData(<eb_macro_gen.objects.Tag object at 0x7f0588e94b00>, "My PLC", "V300_cmd", 1)
+        SetData(valve_cmd_value, "My PLC", "V300_cmd", 1)
     end if
     
     // V400 selected
@@ -215,7 +215,7 @@ macro_command main()
         // Read command from HMI
         GetData(valve_cmd_value, "Local HMI", "valve_cmd_ind", 1)
         // Write command to PLC
-        SetData(<eb_macro_gen.objects.Tag object at 0x7f0588e94b00>, "My PLC", "V400_cmd", 1)
+        SetData(valve_cmd_value, "My PLC", "V400_cmd", 1)
     end if
     
     // V401 selected
@@ -226,7 +226,7 @@ macro_command main()
         // Read command from HMI
         GetData(valve_cmd_value, "Local HMI", "valve_cmd_ind", 1)
         // Write command to PLC
-        SetData(<eb_macro_gen.objects.Tag object at 0x7f0588e94b00>, "My PLC", "V401_cmd", 1)
+        SetData(valve_cmd_value, "My PLC", "V401_cmd", 1)
     end if
     
     // V402 selected
@@ -237,7 +237,7 @@ macro_command main()
         // Read command from HMI
         GetData(valve_cmd_value, "Local HMI", "valve_cmd_ind", 1)
         // Write command to PLC
-        SetData(<eb_macro_gen.objects.Tag object at 0x7f0588e94b00>, "My PLC", "V402_cmd", 1)
+        SetData(valve_cmd_value, "My PLC", "V402_cmd", 1)
     end if
     
 end macro_command

@@ -24,10 +24,20 @@ def deboolify(value:Optional[DT]) -> Union[DT, int]:
 class Resource:
     ID_COUNT = 0
     def __init__(self, *resources:Resource):
+        """Constructor
+        
+        Args:
+            *resources (Resource): Sub resources
+        """
         self.resources:Set[Resource] = set(filter(lambda x: isinstance(x, Resource), resources))
         self._id = Resource.ID_COUNT
         Resource.ID_COUNT += 1
     def process(self, macro:Macro) -> None:
+        """Processes the resource
+
+        Args:
+            macro (Macro): The containing macro
+        """
         for r in self.resources:
             if isinstance(r, Resource) and not r.__class__ is Resource:
                 r.process(macro)
@@ -45,17 +55,33 @@ class STATEMENT(Resource):
         super().process(macro)
         
     def bake(self, macro:Macro):
+        """Bakes the statement. In other words, writes the statement to the macro buffer
+
+        Args:
+            macro (Macro): The containing macro
+        """
         macro.write_raw(str(self))
         
 class EMPTY(STATEMENT):
+    """An empty line
+    """
     def __init__(self):
+        """An empty line
+        """
         super().__init__()
         
     def __str__(self) -> str:
         return '\n'
 
 class BASE_STATEMENT(STATEMENT):
+    """A concrete implementation of a statement
+    """
     def __init__(self, value:str=None):
+        """A concrete implementation of a statement
+
+        Args:
+            value (str, optional): Literal value to forward to the macro. Defaults to None.
+        """
         super().__init__()
         self._res = value
         
@@ -65,7 +91,14 @@ class BASE_STATEMENT(STATEMENT):
         return self._res + '\n'
 
 class COMMENT(STATEMENT):
+    """A comment
+    """
     def __init__(self, text:str):
+        """A comment
+
+        Args:
+            text (str): The commented text
+        """
         super().__init__()
         self.text = text
         
@@ -73,7 +106,14 @@ class COMMENT(STATEMENT):
         return ''.join([f'// {l}\n' for l in self.text.splitlines(False)])
 
 class C_IF(STATEMENT):
+    """Custom implementation of an `if`
+    """
     def __init__(self, condition:Union[EXPRESSION, Variable[bool], VariableItem[bool]]):
+        """Custom implementation of an `if`
+
+        Args:
+            condition (Union[EXPRESSION, Variable[bool], VariableItem[bool]]): The condition for the if
+        """
         super().__init__()
         condition = deboolify(condition)
         if isinstance(condition, (Variable, VariableItem)):
@@ -93,11 +133,20 @@ class C_IF(STATEMENT):
         macro._open_if()
 
 class CONDITION_BLOCK(STATEMENT):
+    """Base class for condition containers
+    """
     def __init__(self, *content:STATEMENT):
+        """Base class for condition containers
+        
+        Args:
+            *content (STATEMENT): The body statements
+        """
         super().__init__()
         self.content:List[STATEMENT] = list([*content])
 
 class COMPLETED_CONTAINER(STATEMENT):
+    """A completed condition block
+    """
     def __init__(self, parent:CONDITION_BLOCK):
         super().__init__()
         self._parent = parent
@@ -181,7 +230,14 @@ class IF_CONTAINER(CONDITION_BLOCK):
             C_END_IF().bake(macro)
 
 class IF(CONDITION_BLOCK):
+    """An IF statement
+    """
     def __init__(self, condition:EXPRESSION):
+        """An IF statement
+
+        Args:
+            condition (EXPRESSION): The condition for the if
+        """
         condition = deboolify(condition)
         super().__init__(C_IF(condition))
         self._empty = True
@@ -216,11 +272,18 @@ class C_ELSE(STATEMENT):
         macro._open_if()
 
 class C_ELIF(STATEMENT):
+    """A custom `ELIF` statement
+    """
     def __init__(self, condition:AnyValue):
+        """A custom `ELIF` statement
+
+        Args:
+            condition (AnyValue): The condition for the elif
+        """
         condition = deboolify(condition)
-        super().__init__()
         if isinstance(condition, (Variable, VariableItem)):
             condition = condition.as_literal()
+        super().__init__(condition)
         self.condition = condition
     
     def __str__(self) -> str:
@@ -238,7 +301,11 @@ class C_ELIF(STATEMENT):
 
 
 class C_END_IF(STATEMENT):
+    """A custom implementation of the `END_IF`
+    """
     def __init__(self):
+        """A custom implementation of the `END_IF`
+        """
         super().__init__()
     
     def __str__(self) -> str:
@@ -249,7 +316,14 @@ class C_END_IF(STATEMENT):
         super().bake(macro)
 
 class BLOCK(STATEMENT):
+    """A collection of statements
+    """
     def __init__(self, *statements:STATEMENT):
+        """A collection of statements
+        
+        Args:
+            *statements (STATEMENT): The contained statements
+        """
         super().__init__()
         self.statements:List[STATEMENT] = list(statements)
         
@@ -263,6 +337,8 @@ class BLOCK(STATEMENT):
             s.bake(macro)
 
 class VARIABLE_BLOCK(STATEMENT):
+    """Internal statement for defining variables
+    """
     def __init__(self):
         super().__init__()
         
@@ -271,6 +347,8 @@ class VARIABLE_BLOCK(STATEMENT):
             macro.write_raw(v.declare(), '\n')
 
 class BEGIN_MACRO(STATEMENT):
+    """Internal statement for the macro start
+    """
     def __init__(self):
         super().__init__()
     
@@ -282,6 +360,8 @@ class BEGIN_MACRO(STATEMENT):
         macro._open_macro()
 
 class END_MACRO(STATEMENT):
+    """Internal statement for the macro end
+    """
     def __init__(self):
         super().__init__()
     
@@ -292,7 +372,9 @@ class END_MACRO(STATEMENT):
         macro._close_macro()
         super().bake(macro)
 
-class ASSIGNEMENT(STATEMENT):
+class ASSIGNMENT(STATEMENT):
+    """Internal statement for variable assignments
+    """
     def __init__(self, var:Union[Variable[DT], VariableItem[DT]], value:Any):
         super().__init__()
         self.var = var
@@ -309,7 +391,15 @@ class ASSIGNEMENT(STATEMENT):
 
 
 class CALL(STATEMENT):
+    """Statement to define function calls
+    """
     def __init__(self, funcName: str, *params:Union[Variable, VariableItem, bool, int, float, str]):
+        """Statement to define function calls
+
+        Args:
+            funcName (str): The name of the function
+            *params (Union[Variable, VariableItem, bool, int, float, str]): The parameters for the function
+        """
         super().__init__()
         self.funcName = funcName
         self.params:List[Union[Variable, VariableItem, bool, int, float, str]] = list([deboolify(p) for p in params])
@@ -324,7 +414,14 @@ class CALL(STATEMENT):
         super().process(macro)
 
 class RETURN(STATEMENT):
+    """The return statement
+    """
     def __init__(self, ret:Union[EXPRESSION, Variable, VariableItem, bool, int, float, str, None] = None):
+        """The return statement
+
+        Args:
+            ret (Union[EXPRESSION, Variable, VariableItem, bool, int, float, str, None], optional): Return value. Defaults to None.
+        """
         super().__init__()
         self.ret = deboolify(ret)
     
@@ -339,14 +436,22 @@ class RETURN(STATEMENT):
         super().process(macro)
 
 class BREAK(STATEMENT):
+    """Break statement
+    """
     def __init__(self):
+        """Break statement
+        """
         super().__init__()
         
     def __str__(self) -> str:
         return 'break'
 
 class CONTINUE(STATEMENT):
+    """Continue statement
+    """
     def __init__(self):
+        """Continue statement
+        """
         super().__init__()
         
     def __str__(self) -> str:
@@ -374,8 +479,8 @@ class CASE_CONTENT(STATEMENT):
 
 class CASE(Resource):
     def __init__(self, match:AnyValue):
-        super().__init__()
         self.match = deboolify(match)
+        super().__init__()
     
     def __call__(self, *body:STATEMENT) -> CASE_CONTENT:
         res = CASE_CONTENT(self.match, *body)
@@ -697,8 +802,8 @@ class Variable(Resource, Generic[DT]):
             res.resources.add(o)
         return res
 
-    def set(self, o:Union[Variable, VariableItem, EXPRESSION, bool, int, float, str]) -> ASSIGNEMENT:
-        return ASSIGNEMENT(self, deboolify(o))
+    def set(self, o:Union[Variable, VariableItem, EXPRESSION, bool, int, float, str]) -> ASSIGNMENT:
+        return ASSIGNMENT(self, deboolify(o))
 
     def __hash__(self) -> int:
         return self.name.__hash__()
@@ -809,8 +914,8 @@ class VariableItem(Resource, Generic[DT]):
             res.resources.add(o)
         return res
 
-    def set(self, o:AnyValue) -> ASSIGNEMENT:
-        return ASSIGNEMENT(self, deboolify(o))
+    def set(self, o:AnyValue) -> ASSIGNMENT:
+        return ASSIGNMENT(self, deboolify(o))
 
     def __str__(self) -> str:
         return f"{self.array.name}[{str(self.index)}]"
@@ -846,7 +951,7 @@ class VariableArray(Resource, Generic[DT]):
             raise IndexError(f"Index {index} out of range, must be between 0 and {self.size - 1}")
         return VariableItem[DT](self, index)
     
-    def __setitem__(self, index:Union[Variable[int], VariableItem[int], EXPRESSION, int], o:Union[Variable, VariableItem, EXPRESSION, bool, int, float, str]) -> ASSIGNEMENT:
+    def __setitem__(self, index:Union[Variable[int], VariableItem[int], EXPRESSION, int], o:Union[Variable, VariableItem, EXPRESSION, bool, int, float, str]) -> ASSIGNMENT:
         if isinstance(index, int) and (index < 0 or index > self.size):
             raise IndexError(f"Index {index} out of range, must be between 0 and {self.size - 1}")
         return VariableItem[DT](self, index).set(o)

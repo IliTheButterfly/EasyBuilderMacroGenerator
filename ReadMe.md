@@ -13,7 +13,34 @@ This project aims to make integration with other systems easier. Notably, the ma
 - A drawing library for the dynamic drawing object
 - A set of tools to import tags from select PLCs (Programmable Logical Computer)
 
+## Usage
+
+First install python
+
+Start by making a venv:
+
+Linux:
+```sh
+python -m venv venv
+source ./venv/bin/activate
+```
+
+Windows:
+```ps
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+Install library:
+```sh
+python -m pip install --upgrade pip
+pip install git+https://github.com/IliTheButterfly/EasyBuilderMacoGenerator.git
+```
+
+Then follow the instructions in [Getting started](./docs/api/getting-started.md).
+
 ## TODO
+- [ ] Fix issue with C_IF where variables only used within C_... will not be processed and therefore not added to the variable list
 - [ ] Add string to char array conversion
 - [ ] Add the rest of the api functions
 - [ ] Add recipe generation and management

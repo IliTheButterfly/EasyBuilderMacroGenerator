@@ -86,7 +86,7 @@ Here are some examples:
 - Some [instructions](03-instructions.md), more specifically, [evals](04-how-does-it-work.md#evals)
 
 ## Statements
-A Statement
+A Statement is an single (or a collection) of macro statements. Contrarily to expressions, statements do not evaluate to a value, they only evaluate to macro instructions.
 
 ## Keywords
 

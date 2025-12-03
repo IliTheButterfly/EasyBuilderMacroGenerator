@@ -14,7 +14,8 @@ from eb_macro_gen.objects import EasyBuilderTag, EasyBuilderTagList
 from eb_macro_gen.plcs.koyo import KoyoTag, KoyoTagList, KOYO_EB_TYPE_MAP
     
     
-def main(argv:List[str]):
+def main():
+    argv = sys.argv
     parser = ArgumentParser("koyo_tags_import")
     parser.add_argument("koyo_file_csv", help="The koyo exported 'nicknames' csv file")
     parser.add_argument("output_file_csv", help="The csv file to export the tags")
@@ -92,4 +93,4 @@ def main(argv:List[str]):
             wr.write(f"{tag.export()}\n")
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()

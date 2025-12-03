@@ -15,9 +15,9 @@ This project aims to make integration with other systems easier. Notably, the ma
 
 ## Usage
 
-First install python
+First install [python](https://www.python.org/downloads/).
 
-Start by making a venv:
+Once installed, make a venv (virtual environment):
 
 Linux:
 ```sh
@@ -34,7 +34,7 @@ python -m venv venv
 Install library:
 ```sh
 python -m pip install --upgrade pip
-pip install git+https://github.com/IliTheButterfly/EasyBuilderMacoGenerator.git
+pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
 ```
 
 Then follow the instructions in [Getting started](./docs/api/getting-started.md).

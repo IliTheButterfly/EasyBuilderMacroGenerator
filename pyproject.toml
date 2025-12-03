@@ -12,15 +12,17 @@ description = "An API to allow generating EasyBuilder Pro macros"
 readme = "ReadMe.md"
 requires-python = ">=3.9"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
 ]
 license = "MIT"
 license-files = ["LICENSE*"]
 dependencies = [
-    "pyperclip",
-    "db-sqlite3",
+  "pyperclip",
+  "db-sqlite3",
 ]
+[project.scripts]
+koyo-tags-import = "eb_macro_gen.tools.koyo_tags_import:main"
 
 
 [tool.hatch.build.targets.sdist]

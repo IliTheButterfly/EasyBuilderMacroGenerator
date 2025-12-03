@@ -5,7 +5,7 @@ def main():
     # Give a name and a description to your macro
     macro1 = Macro("test_macro1", "A test macro")
     
-    # You should define the name of the HMI and PLS(s) globally for ease of use
+    # You should define the name of the HMI and PLC(s) globally for ease of use
     
     HMI_NAME = "Local HMI"
     PLC_NAME = "My PLC"
@@ -20,7 +20,7 @@ def main():
     tag3 = Tag("tag3", HMI_NAME, string_literal("tag3"), DataType.U32)
     tag4 = Tag("tag4", HMI_NAME, string_literal("tag4"), DataType.F32)
     
-    # Note the use of 'string_literal'. It is needed to differenciate between 
+    # Note the use of 'string_literal'. It is needed to differentiate between 
     # addresses and address names. It essentially adds '"' at the beginning and end
     
     # It is generally preferable to use tag names as they will still correspond 
@@ -68,7 +68,7 @@ def main():
             
             # Blocks
             BLOCK(
-                # The use of blocks will be discussed in the next macro
+                # The use of blocks will be discussed in the last macro
                 
                 # The std instructions can also be called directly
                 GetData(tag4_value, HMI_NAME, string_literal("tag4")),

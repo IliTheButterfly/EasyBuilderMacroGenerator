@@ -37,7 +37,7 @@ python -m pip install --upgrade pip
 pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
 ```
 
-Then follow the instructions in [Getting started](./docs/api/getting-started.md).
+Then follow the instructions in [Getting started](docs/api/01-getting-started.md).
 
 ## TODO
 - [ ] Fix issue with C_IF where variables only used within C_... will not be processed and therefore not added to the variable list

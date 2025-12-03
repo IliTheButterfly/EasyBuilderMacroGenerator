@@ -6,6 +6,8 @@ set -e
 # Remove venv
 rm -rf test_venv
 
+BRANCH=$(git branch --show-current)
+
 # Add venv
 python -m venv test_venv
 . ./test_venv/bin/activate
@@ -14,7 +16,7 @@ python -m venv test_venv
 python -m pip install --upgrade pip
 
 # Install the library
-pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
+pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git@$BRANCH
 
 # Run code to test
 python ./examples/simple.py

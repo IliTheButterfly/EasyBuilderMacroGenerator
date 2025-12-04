@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import Enum
 from collections import deque
 from itertools import repeat
-from typing import Any, Callable, Generic, List, Literal, Optional, Set, Tuple, TypeAlias, TypeVar, Union, overload
+from typing import IO, Any, Callable, Generic, List, Literal, Optional, Set, TextIO, Tuple, TypeAlias, TypeVar, Union, overload
 
 DT = TypeVar('DT')
 
@@ -230,10 +230,10 @@ class IF_CONTAINER(CONDITION_BLOCK):
             C_END_IF().bake(macro)
 
 class IF(CONDITION_BLOCK):
-    """An IF statement
+    """An `if` statement
     """
     def __init__(self, condition:EXPRESSION):
-        """An IF statement
+        """An `if` statement
 
         Args:
             condition (EXPRESSION): The condition for the if
@@ -260,7 +260,11 @@ class IF(CONDITION_BLOCK):
         
     
 class C_ELSE(STATEMENT):
+    """A custom `else` statement
+    """
     def __init__(self):
+        """A custom `else` statement
+        """
         super().__init__()
     
     def __str__(self) -> str:
@@ -272,10 +276,10 @@ class C_ELSE(STATEMENT):
         macro._open_if()
 
 class C_ELIF(STATEMENT):
-    """A custom `ELIF` statement
+    """A custom `else if` statement
     """
     def __init__(self, condition:AnyValue):
-        """A custom `ELIF` statement
+        """A custom `else if` statement
 
         Args:
             condition (AnyValue): The condition for the elif
@@ -301,10 +305,10 @@ class C_ELIF(STATEMENT):
 
 
 class C_END_IF(STATEMENT):
-    """A custom implementation of the `END_IF`
+    """A custom implementation of the `end if`
     """
     def __init__(self):
-        """A custom implementation of the `END_IF`
+        """A custom implementation of the `end if`
         """
         super().__init__()
     
@@ -414,10 +418,10 @@ class CALL(STATEMENT):
         super().process(macro)
 
 class RETURN(STATEMENT):
-    """The return statement
+    """Return statement
     """
     def __init__(self, ret:Union[EXPRESSION, Variable, VariableItem, bool, int, float, str, None] = None):
-        """The return statement
+        """Return statement
 
         Args:
             ret (Union[EXPRESSION, Variable, VariableItem, bool, int, float, str, None], optional): Return value. Defaults to None.
@@ -478,7 +482,14 @@ class CASE_CONTENT(STATEMENT):
             C_END_IF().bake(macro)
 
 class CASE(Resource):
+    """A single case for a `SWITCH`
+    """
     def __init__(self, match:AnyValue):
+        """A single case for a `SWITCH`
+        
+        Args:
+            match (AnyValue): the value to match
+        """
         self.match = deboolify(match)
         super().__init__()
     
@@ -488,11 +499,23 @@ class CASE(Resource):
         return res
     
 class SWITCH(Resource):
+    """A series of `if/else if` that act similar to a switch case
+    """
     def __init__(self, expression:AnyValue):
+        """A series of `if/else if` that act similar to a switch case
+
+        Args:
+            expression (AnyValue): The expression to match for the cases
+        """
         super().__init__(expression)
         self.expression = deboolify(expression)
     
     def __call__(self, *cases:CASE_CONTENT) -> BLOCK:
+        """The content of the `SWITCH`
+        
+        Args:
+            *cases (CASE_CONTENT): A series of `CASE(match)(...)`
+        """
         cases = list(cases)
         cases[-1]._end = True
         cases[0]._start = True
@@ -502,7 +525,14 @@ class SWITCH(Resource):
         
     
 class EXPRESSION(Resource):
+    """Base class for expressions
+    """
     def __init__(self, *exps:EXPRESSION):
+        """Base class for expressions
+        
+        Args:
+            *exps (EXPRESSION): Sub expressions
+        """
         super().__init__(*exps)
     
     def __and__(self, other:Union[EXPRESSION, Variable[bool], VariableItem[bool]]) -> EXPRESSION:
@@ -608,7 +638,14 @@ class EXPRESSION(Resource):
     def __str__(self) -> str: ...
     
 class EVAL(EXPRESSION):
+    """A function that evaluates to a value
+    """
     def __init__(self, funcName: str, *params:Union[Variable, VariableItem, bool, int, float, str]):
+        """A function that evaluates to a value
+        Args:
+            funcName (str): The name of the function
+            *params (Union[Variable, VariableItem, bool, int, float, str]): The parameters for the function
+        """
         super().__init__()
         self.funcName = funcName
         self.params:List[Union[Variable, VariableItem, bool, int, float, str]] = list([deboolify(p) for p in params])
@@ -626,7 +663,14 @@ class EVAL(EXPRESSION):
         super().process(macro)
     
 class LITERAL(EXPRESSION):
+    """A literal value
+    """
     def __init__(self, literal:str):
+        """A literal value
+
+        Args:
+            literal (str): The literal value. This value will be pasted as-is into the generated macro
+        """
         super().__init__()
         self.literal = literal
         
@@ -697,7 +741,16 @@ class AND(EXPRESSION):
         return f'[{" AND ".join([repr(e) for e in self._expressions])}]'
 
 class Variable(Resource, Generic[DT]):
+    """Defines a variable
+    """
     def __init__(self, name:str, dtype:dt, default:DT=None):
+        """Defines a variable
+
+        Args:
+            name (str): The name of the variable
+            dtype (dt): The data type
+            default (DT, optional): The default value. Defaults to None.
+        """
         Resource.__init__(self)
         self.name = name
         self.dtype = dtype
@@ -995,6 +1048,12 @@ class BlockType(Enum):
 
 class Macro:
     def __init__(self, name:str, description:Optional[str]=None):
+        """A macro definition
+
+        Args:
+            name (str): The name of the macro
+            description (str, optional): The description of the macro. Defaults to None.
+        """
         self.name = name
         self.description = description
         if self.description is None:
@@ -1024,6 +1083,8 @@ class Macro:
         return var
     
     def write_raw(self, *values:str):
+        """Internal method to write text
+        """
         v = ''.join([str(vv) for vv in values])
         for l in v.splitlines():
             l = ''.join(repeat('    ', self.indentation)) + l + '\n'
@@ -1033,6 +1094,14 @@ class Macro:
                 self.result[-1] += l
     
     def write(self, *statements:STATEMENT):
+        """Write statements to the macro
+
+        Args:
+            *statements (STATEMENT): Statements to add
+
+        Raises:
+            SyntaxError: If a not a statement
+        """
         for s in statements:
             if not isinstance(s, STATEMENT):
                 raise SyntaxError(f"{s} is not a statement")
@@ -1100,7 +1169,12 @@ class Macro:
     def end(self):
         self.write(END_MACRO())
     
-    def display(self):
+    def display(self, io:TextIO=None):
+        """Displays the resulting macro
+
+        Args:
+            io (TextIO, optional): Stream to print the macro to. Defaults to stdout.
+        """
         self.result = ['']
         for s in self.statements:
             s.process(self)
@@ -1109,9 +1183,11 @@ class Macro:
             s.bake(self)
         
         for l in self.result:
-            print(l, end='')
+            print(l, end='', file=io)
             
     def clipboard(self):
+        """Copies the resulting macro to clipboard
+        """
         import pyperclip
         self.result = ['']
         for s in self.statements:
@@ -1186,6 +1262,14 @@ TagAddress = Union[str, Tuple[str, int]]
 
 
 def string_literal(v:str) -> str:
+    """Wraps a str in '"' if needed
+
+    Args:
+        v (str): String to wrap
+
+    Returns:
+        str: Wrapped string
+    """
     if not v.startswith('"'):
         v = '"' + v
     if not v.endswith('"'):
@@ -1193,6 +1277,14 @@ def string_literal(v:str) -> str:
     return v
 
 def ensure_string_is_literal(v:DT) -> DT:
+    """Ensures that if a string is passed, it gets wrapped in '"'
+
+    Args:
+        v (DT): Value to process
+
+    Returns:
+        DT: Processed value
+    """
     if isinstance(v, str):
         return string_literal(v)
     return v

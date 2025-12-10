@@ -62,6 +62,9 @@ class STATEMENT(Resource):
         """
         macro.write_raw(str(self))
         
+    def __hash__(self):
+        return super().__hash__()
+        
 class EMPTY(STATEMENT):
     """An empty line
     """
@@ -72,6 +75,9 @@ class EMPTY(STATEMENT):
         
     def __str__(self) -> str:
         return '\n'
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class BASE_STATEMENT(STATEMENT):
     """A concrete implementation of a statement
@@ -89,6 +95,9 @@ class BASE_STATEMENT(STATEMENT):
         if self._res is None:
             return '\n'
         return self._res + '\n'
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class COMMENT(STATEMENT):
     """A comment
@@ -104,6 +113,9 @@ class COMMENT(STATEMENT):
         
     def __str__(self) -> str:
         return ''.join([f'// {l}\n' for l in self.text.splitlines(False)])
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class C_IF(STATEMENT):
     """Custom implementation of an `if`
@@ -131,6 +143,9 @@ class C_IF(STATEMENT):
     def bake(self, macro:Macro):
         super().bake(macro)
         macro._open_if()
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class CONDITION_BLOCK(STATEMENT):
     """Base class for condition containers
@@ -143,6 +158,9 @@ class CONDITION_BLOCK(STATEMENT):
         """
         super().__init__()
         self.content:List[STATEMENT] = list([*content])
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class COMPLETED_CONTAINER(STATEMENT):
     """A completed condition block
@@ -156,6 +174,9 @@ class COMPLETED_CONTAINER(STATEMENT):
 
     def bake(self, macro: Macro):
         self._parent.bake(macro)
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class ELSE_CONTAINER(CONDITION_BLOCK):
     def __init__(self, parent:CONDITION_BLOCK):
@@ -179,6 +200,9 @@ class ELSE_CONTAINER(CONDITION_BLOCK):
             s.bake(macro)
         if self._empty:
             C_END_IF().bake(macro)
+            
+    def __hash__(self):
+        return super().__hash__()
 
 class ELIF_CONTAINER(CONDITION_BLOCK):
     def __init__(self, parent:CONDITION_BLOCK):
@@ -202,6 +226,8 @@ class ELIF_CONTAINER(CONDITION_BLOCK):
         if self._empty:
             C_END_IF().bake(macro)
 
+    def __hash__(self):
+        return super().__hash__()
 
 class IF_CONTAINER(CONDITION_BLOCK):
     def __init__(self, parent:CONDITION_BLOCK):
@@ -228,6 +254,9 @@ class IF_CONTAINER(CONDITION_BLOCK):
             s.bake(macro)
         if self._ends:
             C_END_IF().bake(macro)
+
+    def __hash__(self):
+        return super().__hash__()
 
 class IF(CONDITION_BLOCK):
     """An `if` statement
@@ -258,6 +287,8 @@ class IF(CONDITION_BLOCK):
         if self._empty:
             C_END_IF().bake(macro)
         
+    def __hash__(self):
+        return super().__hash__()
     
 class C_ELSE(STATEMENT):
     """A custom `else` statement
@@ -274,6 +305,9 @@ class C_ELSE(STATEMENT):
         macro._close_if()
         super().bake(macro)
         macro._open_if()
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class C_ELIF(STATEMENT):
     """A custom `else if` statement
@@ -302,7 +336,9 @@ class C_ELIF(STATEMENT):
         macro._close_if()
         super().bake(macro)
         macro._open_if()
-
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class C_END_IF(STATEMENT):
     """A custom implementation of the `end if`
@@ -318,6 +354,9 @@ class C_END_IF(STATEMENT):
     def bake(self, macro:Macro):
         macro._close_if()
         super().bake(macro)
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class BLOCK(STATEMENT):
     """A collection of statements
@@ -339,6 +378,9 @@ class BLOCK(STATEMENT):
     def bake(self, macro):
         for s in self.statements:
             s.bake(macro)
+            
+    def __hash__(self):
+        return super().__hash__()
 
 class VARIABLE_BLOCK(STATEMENT):
     """Internal statement for defining variables
@@ -349,6 +391,9 @@ class VARIABLE_BLOCK(STATEMENT):
     def bake(self, macro: Macro):
         for v in macro.variables:
             macro.write_raw(v.declare(), '\n')
+            
+    def __hash__(self):
+        return super().__hash__()
 
 class BEGIN_MACRO(STATEMENT):
     """Internal statement for the macro start
@@ -362,6 +407,9 @@ class BEGIN_MACRO(STATEMENT):
     def bake(self, macro:Macro):
         super().bake(macro)
         macro._open_macro()
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class END_MACRO(STATEMENT):
     """Internal statement for the macro end
@@ -375,6 +423,9 @@ class END_MACRO(STATEMENT):
     def bake(self, macro:Macro):
         macro._close_macro()
         super().bake(macro)
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class ASSIGNMENT(STATEMENT):
     """Internal statement for variable assignments
@@ -392,6 +443,9 @@ class ASSIGNMENT(STATEMENT):
         if isinstance(self.value, Resource):
             self.value.process(macro)
         super().process(macro)
+        
+    def __hash__(self):
+        return super().__hash__()
 
 
 class CALL(STATEMENT):
@@ -416,6 +470,9 @@ class CALL(STATEMENT):
             if isinstance(p, Resource):
                 p.process(macro)
         super().process(macro)
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class RETURN(STATEMENT):
     """Return statement
@@ -438,6 +495,9 @@ class RETURN(STATEMENT):
         if isinstance(self.ret, Resource):
             self.ret.process(macro)
         super().process(macro)
+        
+    def __hash__(self):
+        return super().__hash__()
 
 class BREAK(STATEMENT):
     """Break statement
@@ -449,6 +509,9 @@ class BREAK(STATEMENT):
         
     def __str__(self) -> str:
         return 'break'
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class CONTINUE(STATEMENT):
     """Continue statement
@@ -460,6 +523,9 @@ class CONTINUE(STATEMENT):
         
     def __str__(self) -> str:
         return 'continue'
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class CASE_CONTENT(STATEMENT):
     def __init__(self, match:AnyValue, *body:STATEMENT):
@@ -480,6 +546,9 @@ class CASE_CONTENT(STATEMENT):
             s.bake(macro)
         if self._end:
             C_END_IF().bake(macro)
+            
+    def __hash__(self):
+        return super().__hash__()
 
 class CASE(Resource):
     """A single case for a `SWITCH`
@@ -497,6 +566,9 @@ class CASE(Resource):
         res = CASE_CONTENT(self.match, *body)
         self.resources.add(res)
         return res
+    
+    def __hash__(self):
+        return super().__hash__()
     
 class SWITCH(Resource):
     """A series of `if/else if` that act similar to a switch case
@@ -522,6 +594,9 @@ class SWITCH(Resource):
         for c in cases:
             c.expression = self.expression
         return BLOCK(*cases)
+    
+    def __hash__(self):
+        return super().__hash__()
         
     
 class EXPRESSION(Resource):
@@ -635,7 +710,17 @@ class EXPRESSION(Resource):
             res.resources.add(o)
         return res
     
+    def __mod__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(self)} % {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+    
     def __str__(self) -> str: ...
+    
+    def __hash__(self):
+        return super().__hash__()
     
 class EVAL(EXPRESSION):
     """A function that evaluates to a value
@@ -661,6 +746,9 @@ class EVAL(EXPRESSION):
             if isinstance(p, Resource):
                 p.process(macro)
         super().process(macro)
+        
+    def __hash__(self):
+        return super().__hash__()
     
 class LITERAL(EXPRESSION):
     """A literal value
@@ -680,6 +768,9 @@ class LITERAL(EXPRESSION):
     def __repr__(self):
         return f"[{self.literal}]"
     
+    def __hash__(self):
+        return super().__hash__()
+    
 class NOT(EXPRESSION):
     def __init__(self, expression:EXPRESSION):
         super().__init__(expression)
@@ -693,6 +784,9 @@ class NOT(EXPRESSION):
     
     def __repr__(self):
         return f'NOT [{repr(self.expression)}]'
+    
+    def __hash__(self):
+        return super().__hash__()
     
 class OR(EXPRESSION):
     def __init__(self, *expressions:EXPRESSION):
@@ -716,6 +810,9 @@ class OR(EXPRESSION):
         
     def __repr__(self):
         return f'[{" OR ".join([repr(e) for e in self._expressions])}]'
+    
+    def __hash__(self):
+        return super().__hash__()
         
 class AND(EXPRESSION):
     def __init__(self, *expressions:Union[EXPRESSION, Variable[bool], VariableItem[bool]]):
@@ -739,6 +836,9 @@ class AND(EXPRESSION):
         
     def __repr__(self):
         return f'[{" AND ".join([repr(e) for e in self._expressions])}]'
+    
+    def __hash__(self):
+        return super().__hash__()
 
 class Variable(Resource, Generic[DT]):
     """Defines a variable
@@ -850,6 +950,13 @@ class Variable(Resource, Generic[DT]):
     
     def __truediv__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} / {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+    
+    def __mod__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(self)} % {str(deboolify(o))}')
         res.resources.add(self)
         if isinstance(o, Resource):
             res.resources.add(o)
@@ -966,12 +1073,22 @@ class VariableItem(Resource, Generic[DT]):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+    
+    def __mod__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(self)} % {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
 
     def set(self, o:AnyValue) -> ASSIGNMENT:
         return ASSIGNMENT(self, deboolify(o))
 
     def __str__(self) -> str:
         return f"{self.array.name}[{str(self.index)}]"
+    
+    def __hash__(self):
+        return hash(str(self))
     
 class VariableArray(Resource, Generic[DT]):
     def __init__(self, name:str, dtype:dt, size:int, default:Optional[List[DT]]=None):
@@ -1295,3 +1412,5 @@ def tag_address(addr:TagAddress) -> str:
     if isinstance(addr, tuple):
         return f"{addr[0]}, {addr[1]}"
     raise SyntaxError(f"Invalid address syntax: {addr}")
+
+

@@ -16,7 +16,9 @@ python -m venv test_venv
 python -m pip install --upgrade pip
 
 # Install the library
-pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git@$BRANCH
+# pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git@$BRANCH
+pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
+
 
 # Run code to test
 python ./examples/simple.py

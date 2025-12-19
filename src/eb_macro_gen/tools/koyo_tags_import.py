@@ -1,6 +1,5 @@
 #!/usr/bin/python
 from __future__ import annotations
-from dataclasses import dataclass
 from pathlib import Path
 from argparse import ArgumentParser
 import sys
@@ -8,8 +7,7 @@ import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
 
-from typing import Generic, Hashable, List, Optional, TypeVar, Union
-from eb_macro_gen.common import DoubleKeyMap, PromptResult, smart_split, prompt_yna
+from eb_macro_gen.common import PromptResult, prompt_yna
 from eb_macro_gen.objects import EasyBuilderTag, EasyBuilderTagList
 from eb_macro_gen.plcs.koyo import KoyoTag, KoyoTagList, KOYO_EB_TYPE_MAP
     

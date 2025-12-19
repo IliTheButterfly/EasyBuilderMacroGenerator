@@ -1,5 +1,6 @@
 __pycache__
 venv
+test_venv
 build
 dist
 .pytest_cache

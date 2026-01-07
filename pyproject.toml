@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "eb_macro_gen"
-version = "1.0.3"
+version = "1.0.4"
 authors = [
   { name="IliTheButterfly", email="iliana.decarufel@gmail.com" },
 ]

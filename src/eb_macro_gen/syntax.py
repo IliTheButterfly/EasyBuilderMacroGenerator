@@ -1114,7 +1114,7 @@ class VariableArray(Resource, Generic[DT]):
     def declare(self) -> str:
         if self.default is None:
             return f'{self.dtype} {self.name}[{self.size}]'
-        return f'{self.dtype} {self.name}[{self.size}] = ' + '{ ' + ", ".join(self.default) + ' }'
+        return f'{self.dtype} {self.name}[{self.size}] = ' + '{ ' + ", ".join([str(e) for e in self.default]) + ' }'
 
     def __getitem__(self, index:Union[Variable[int], VariableItem[int], EXPRESSION, int]) -> VariableItem[DT]:
         if isinstance(index, int) and index > self.size:

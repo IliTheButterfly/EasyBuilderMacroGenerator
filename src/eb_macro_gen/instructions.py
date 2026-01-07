@@ -823,7 +823,7 @@ ERROR(" a = %d", a)
     """
     return TRACE("[ERROR] " + fmt, *values)
 
-def SetData(send_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
+def SetData(send_data:AnyVariable, device_name:str, address:TagAddress, data_count:Optional[AnyInt] = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Write data to a device and stop script execution if no response from this device.
@@ -845,9 +845,11 @@ SetData(wData[0], "Local HMI", "Pressure", 6
 //  use user-defined tag - "Pressure" to indicate device type and address.
 ```
     """
+    if data_count is None:
+        return CALL('SetData', send_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address))
     return CALL('SetData', send_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
-def SetDataEx(send_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
+def SetDataEx(send_data:AnyVariable, device_name:str, address:TagAddress, data_count:Optional[AnyInt] = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Write data to a device and continue executing next command
@@ -870,9 +872,11 @@ SetDataEx(wData[0], "Local HMI", "Pressure", 6
 //  use user-defined tag - "Pressure" to indicate device type and address.
 ```
     """
+    if data_count is None:
+        return CALL('SetDataEx', send_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address))
     return CALL('SetDataEx', send_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
-def GetData(read_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
+def GetData(read_data:AnyVariable, device_name:str, address:TagAddress, data_count:Optional[AnyInt] = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Read data from a device.
@@ -891,9 +895,11 @@ GetData(wData[0], "Local HMI", "Pressure", 6)
 //  use user-defined tag - "Pressure" to indicate device type and address.
 ```
     """
+    if data_count is None:
+        return CALL('GetData', read_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address))
     return CALL('GetData', read_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
-def GetDataEx(read_data:AnyVariable, device_name:str, address:TagAddress, data_count:AnyInt = 1, dont_format:bool=False) -> CALL:
+def GetDataEx(read_data:AnyVariable, device_name:str, address:TagAddress, data_count:Optional[AnyInt] = 1, dont_format:bool=False) -> CALL:
     """
 [Description]
 Read data from a device and continue executing next command
@@ -923,6 +929,8 @@ if err == 0 then
 end if
 ```
     """
+    if data_count is None:
+        return CALL('GetDataEx', read_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address))
     return CALL('GetDataEx', read_data, string_literal(device_name), address if dont_format else ensure_string_is_literal(address), data_count)
 
 def GetError(error:AnyVariable[int]) -> CALL:

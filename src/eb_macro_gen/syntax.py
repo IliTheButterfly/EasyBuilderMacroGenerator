@@ -982,7 +982,7 @@ class VariableItem(Resource, Generic[DT]):
         
     def process(self, macro:Macro) -> None:
         Resource.process(self, macro)
-        macro.add_variable(self)
+        macro.add_variable(self.array)
         
     def as_literal(self) -> LITERAL:
         res = LITERAL(str(self))

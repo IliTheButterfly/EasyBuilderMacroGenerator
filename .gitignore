@@ -6,3 +6,6 @@ dist
 .pytest_cache
 *.pyc
 temp
+.vscode
+!.vscode/launch.json
+!.vscode/settings.json

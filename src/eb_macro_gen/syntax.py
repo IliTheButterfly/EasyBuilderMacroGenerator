@@ -722,7 +722,7 @@ class EXPRESSION(Resource):
     def __hash__(self):
         return super().__hash__()
     
-class EVAL(EXPRESSION):
+class EVAL(EXPRESSION, Generic[DT]):
     """A function that evaluates to a value
     """
     def __init__(self, funcName: str, *params:Union[Variable, VariableItem, bool, int, float, str]):
@@ -1370,11 +1370,12 @@ def C_MAX(a:Union[DT, Variable[DT]], b:Union[DT, Variable[DT]], r:Variable[DT]) 
     return r.set(b)
 
 AnyVariable = Union[Variable[DT], VariableItem[DT]]
-AnyValue = Union[Variable, VariableItem, EXPRESSION, int, bool, float]
+AnyValue = Union[Variable, VariableItem, EXPRESSION, int, bool, float, str]
 
 AnyBool = Union[Variable[bool], VariableItem[bool], EXPRESSION, bool]
-AnyInt = Union[Variable[int], VariableArray[int], EXPRESSION, int]
+AnyInt = Union[Variable[int], VariableItem[int], EXPRESSION, int]
 AnyFloat = Union[Variable[float], VariableItem[float], EXPRESSION, float]
+AnyString = Union[VariableItem[int], EXPRESSION, LITERAL, str]
 TagAddress = Union[str, Tuple[str, int]]
 
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "eb_macro_gen"
-version = "1.0.4"
+version = "1.0.5"
 authors = [
   { name="IliTheButterfly", email="iliana.decarufel@gmail.com" },
 ]
@@ -23,6 +23,7 @@ dependencies = [
 ]
 [project.scripts]
 koyo-tags-import = "eb_macro_gen.tools.koyo_tags_import:main"
+combine-tags = "eb_macro_gen.tools.combine_tags:main"
 
 
 [tool.hatch.build.targets.sdist]

@@ -1,0 +1,2 @@
+pyperclip
+db-sqlite3

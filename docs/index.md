@@ -8,3 +8,4 @@
 
 ## Tools
 - [`koyo_tags_import`](tools/koyo-tags-import.md)
+- [`combine_tags`](tools/combine-tags.md)

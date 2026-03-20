@@ -45,3 +45,5 @@ Run:
 ```sh
 koyo_tags_import -a "eb_tags.csv" "koyo_tags.csv" "output.csv" "KOYO CLICK V3 MODBUS TCP/IP"
 ```
+| [Index](../index.md) |
+|:-:|

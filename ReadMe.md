@@ -39,6 +39,19 @@ pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
 
 Then follow the instructions in [Getting started](docs/api/01-getting-started.md).
 
+## Running tests
+
+Create and activate a virtual environment (same as the setup instructions above), then install development dependencies and run pytest:
+
+```sh
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+pip install -e .
+pytest
+```
+
+VS Code is preconfigured in `.vscode/settings.json` to run pytest from the repository root with the `src/` layout. Open the Testing panel and click **Run Tests**.
+
 ## TODO
 - [ ] Fix issue with C_IF where variables only used within C_... will not be processed and therefore not added to the variable list
 - [ ] Add string to char array conversion

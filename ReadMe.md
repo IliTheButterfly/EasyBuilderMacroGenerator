@@ -54,8 +54,6 @@ VS Code is preconfigured in `.vscode/settings.json` to run pytest from the repos
 If VS Code shows `No module named pytest`, your selected interpreter is missing test dependencies. Install them in that same environment with `pip install -e ".[dev]"` (or `pip install pytest`).
 
 ## TODO
-- [ ] Fix issue with C_IF where variables only used within C_... will not be processed and therefore not added to the variable list
 - [ ] Add string to char array conversion
-- [ ] Add the rest of the api functions
 - [ ] Add recipe generation and management
 - [ ] Add structs as a concept that integrates in the code

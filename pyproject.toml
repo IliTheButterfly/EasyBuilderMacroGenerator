@@ -21,6 +21,11 @@ dependencies = [
   "pyperclip",
   "db-sqlite3",
 ]
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+]
+
 [project.scripts]
 koyo-tags-import = "eb_macro_gen.tools.koyo_tags_import:main"
 combine-tags = "eb_macro_gen.tools.combine_tags:main"

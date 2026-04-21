@@ -45,12 +45,13 @@ Create and activate a virtual environment (same as the setup instructions above)
 
 ```sh
 python -m pip install --upgrade pip
-pip install -r requirements.txt
-pip install -e .
+pip install -e ".[dev]"
 pytest
 ```
 
 VS Code is preconfigured in `.vscode/settings.json` to run pytest from the repository root with the `src/` layout. Open the Testing panel and click **Run Tests**.
+
+If VS Code shows `No module named pytest`, your selected interpreter is missing test dependencies. Install them in that same environment with `pip install -e ".[dev]"` (or `pip install pytest`).
 
 ## TODO
 - [ ] Fix issue with C_IF where variables only used within C_... will not be processed and therefore not added to the variable list

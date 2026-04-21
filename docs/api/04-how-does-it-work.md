@@ -54,5 +54,5 @@ An `EVAL` is similar to a `CALL` except it is actually an `EXPRESSION`. It is al
 ## Variables
 `Variable`s are described a bit [here](02-syntax.md#variables), but here is a more detailed explanation. A `Variable` is a `Resource` but it has its own way to be contained in a `Macro`. `Macro` actually has a storage specifically for variables in order to define variables at the beginning of the macro. This is possible thanks to the `process` method. At process-time, the variables are added to the `Macro`s variable `set`
 
-|[Previous](03-instructions.md) | [Index](../index.md) | [Next]() |
+|[Previous](03-instructions.md) | [Index](../index.md) | [Next](05-tags-generator.md) |
 |:-|:-:|-:|

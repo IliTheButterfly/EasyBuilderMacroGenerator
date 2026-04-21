@@ -9,35 +9,67 @@ EasyBuilder Pro is an HMI (Human Machine Interface) designer app that integrates
 This project aims to make integration with other systems easier. Notably, the macro system provided by Weintek lacks some key functionalities and can be a bit tedious to use. So this library attempts to make writing macro code a bit more enjoyable.
 
 ## Tools provided
-- A python library to allow writing macros in python and generating the resulting macro
+- A Python library to write macros in Python and generate the resulting EasyBuilder macro code
 - A drawing library for the dynamic drawing object
-- A set of tools to import tags from select PLCs (Programmable Logical Computer)
+- A set of tools to import and merge tags from select PLCs (Programmable Logic Controllers)
 
-## Usage
+## Installation
 
-First install [python](https://www.python.org/downloads/) (Python 3.9 or newer).
+First install [Python](https://www.python.org/downloads/) (Python 3.9 or newer).
 
-Once installed, make a venv (virtual environment):
+Once installed, create a virtual environment:
 
-Linux:
+**Linux / macOS:**
 ```sh
 python -m venv venv
 source ./venv/bin/activate
 ```
 
-Windows:
+**Windows:**
 ```ps
 python -m venv venv
 .\venv\Scripts\activate
 ```
 
-Install library:
+Install the library:
 ```sh
 python -m pip install --upgrade pip
 pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
 ```
 
 Then follow the instructions in [Getting started](docs/api/01-getting-started.md).
+
+## Tag import tools
+
+### CLI tools
+
+| Tool | Description |
+|---|---|
+| `koyo_tags_import` | Convert a Koyo PLC nicknames CSV to an EasyBuilder tag CSV |
+| `combine_tags` | Merge two EasyBuilder tag CSV files into one |
+
+Both tools support `--force`, `--strategy`, and `--dry-run` flags. See their individual docs for details.
+
+### Python API
+
+The same functionality is available as importable functions for use in scripts:
+
+```python
+from eb_macro_gen.tools.io import load_eb_tags, save_eb_tags, load_koyo_tags
+from eb_macro_gen.tools.merge import merge_eb_tags, ConflictStrategy
+
+# Load and convert Koyo PLC nicknames
+koyo_tags = load_koyo_tags("koyo_nicknames.csv", "MyKoyoPLC")
+
+# Merge with existing EasyBuilder tags
+existing = load_eb_tags("eb_tags.csv")
+merged, result = merge_eb_tags(existing, koyo_tags, strategy=ConflictStrategy.REPLACE_ADDRESS)
+print(result)
+
+save_eb_tags(merged, "output.csv")
+```
+
+See the [Tags generator docs](docs/api/05-tags-generator.md) for a full end-to-end example including using loaded tags directly in macro generation.
 
 ## Running tests
 
@@ -57,3 +89,4 @@ If VS Code shows `No module named pytest`, your selected interpreter is missing 
 - [ ] Add string to char array conversion
 - [ ] Add recipe generation and management
 - [ ] Add structs as a concept that integrates in the code
+- [ ] Add Rockwell tag import tool

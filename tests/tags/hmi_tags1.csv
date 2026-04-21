@@ -1,0 +1,37 @@
+V1,Local HMI,LW, 300,V1 value,16-bit Signed
+D1,Local HMI,LW, 400,D1 value,16-bit Signed
+V2,Local HMI,LW, 301,V2 value,16-bit Signed
+D2,Local HMI,LW, 401,D2 value,16-bit Signed
+V3,Local HMI,LW, 302,V3 value,16-bit Signed
+D3,Local HMI,LW, 402,D3 value,16-bit Signed
+V4,Local HMI,LW, 303,V4 value,16-bit Signed
+D4,Local HMI,LW, 403,D4 value,16-bit Signed
+V5,Local HMI,LW, 304,V5 value,16-bit Signed
+D5,Local HMI,LW, 404,D5 value,16-bit Signed
+V6,Local HMI,LW, 305,V6 value,16-bit Signed
+D6,Local HMI,LW, 405,D6 value,16-bit Signed
+V7,Local HMI,LW, 306,V7 value,16-bit Signed
+D7,Local HMI,LW, 406,D7 value,16-bit Signed
+V8,Local HMI,LW, 307,V8 value,16-bit Signed
+D8,Local HMI,LW, 407,D8 value,16-bit Signed
+V9,Local HMI,LW, 308,V9 value,16-bit Signed
+D9,Local HMI,LW, 408,D9 value,16-bit Signed
+V10,Local HMI,LW, 309,V10 value,16-bit Signed
+D10,Local HMI,LW, 409,D10 value,16-bit Signed
+F1,Local HMI,LW, 600,F1 value,16-bit Signed
+F2,Local HMI,LW, 601,F2 value,16-bit Signed
+F3,Local HMI,LW, 602,F3 value,16-bit Signed
+F4,Local HMI,LW, 603,F4 value,16-bit Signed
+F5,Local HMI,LW, 604,F5 value,16-bit Signed
+F6,Local HMI,LW, 605,F6 value,16-bit Signed
+F7,Local HMI,LW, 606,F7 value,16-bit Signed
+F8,Local HMI,LW, 607,F8 value,16-bit Signed
+F9,Local HMI,LW, 608,F9 value,16-bit Signed
+F10,Local HMI,LW, 609,F10 value,16-bit Signed
+BitIN,KOYO CLICK V3 MODBUS TCP/IP,X,001,,
+BitOUT,KOYO CLICK V3 MODBUS TCP/IP,Y,001,,
+MemBit,KOYO CLICK V3 MODBUS TCP/IP,C,1,,
+Timer1_dn,KOYO CLICK V3 MODBUS TCP/IP,T,1,,
+Time1,KOYO CLICK V3 MODBUS TCP/IP,DS,1,,16-bit Signed
+Value1,KOYO CLICK V3 MODBUS TCP/IP,DF,1,,32-bit Float
+Timer1_acc,KOYO CLICK V3 MODBUS TCP/IP,TD,1,,16-bit Signed

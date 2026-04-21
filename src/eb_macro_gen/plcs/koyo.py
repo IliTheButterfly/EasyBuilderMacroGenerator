@@ -1,5 +1,10 @@
 from __future__ import annotations
-from typing import IO, Dict, Union, override
+from typing import IO, Dict, Union
+
+try:
+    from typing import override
+except ImportError:
+    from typing_extensions import override
 from dataclasses import dataclass
 from eb_macro_gen.common import DoubleKeyMap, smart_split
 from eb_macro_gen.objects import DT_EB_MAP, EB_DT_MAP, Tag, TagList

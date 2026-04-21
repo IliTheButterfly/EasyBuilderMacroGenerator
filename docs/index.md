@@ -5,6 +5,7 @@
 - [Syntax](api/02-syntax.md)
 - [Instructions](api/03-instructions.md)
 - [How does it work?](api/04-how-does-it-work.md)
+- [Tags generator (`EasyBuilderTagList`)](api/05-tags-generator.md)
 
 ## Tools
 - [`koyo_tags_import`](tools/koyo-tags-import.md)

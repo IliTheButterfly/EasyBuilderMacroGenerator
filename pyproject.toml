@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "eb_macro_gen"
-version = "1.0.5"
+version = "1.1.0"
 authors = [
   { name="IliTheButterfly", email="iliana.decarufel@gmail.com" },
 ]
@@ -20,7 +20,13 @@ license-files = ["LICENSE*"]
 dependencies = [
   "pyperclip",
   "db-sqlite3",
+  "typing_extensions>=4.0; python_version < '3.12'",
 ]
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+]
+
 [project.scripts]
 koyo-tags-import = "eb_macro_gen.tools.koyo_tags_import:main"
 combine-tags = "eb_macro_gen.tools.combine_tags:main"
@@ -35,3 +41,7 @@ include = [
 [project.urls]
 Homepage = "https://github.com/IliTheButterfly/EasyBuilderMacroGnerator"
 Issues = "https://github.com/IliTheButterfly/EasyBuilderMacroGnerator/issues"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

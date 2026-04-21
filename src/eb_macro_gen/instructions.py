@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple
+from typing import Optional, Union
 from .syntax import *
 
 def ACOS(source:AnyVariable[DT], result:AnyVariable[DT]) -> CALL:
@@ -1643,3 +1643,1544 @@ result = StringLength("1234\"5678\"90") // "result" is equal to 12
 ```
     """
     return EVAL("StringLength", source)
+
+# ============================================================
+# DATA OPERATION FUNCTIONS
+# ============================================================
+
+def FILL(start: VariableItem[DT], value: AnyValue[DT], count: AnyInt) -> CALL:
+    """
+[Description]
+Sets array elements to the specified value.
+
+[Usage]
+`FILL(destination[start], value, count)`
+
+[Example]
+```
+char data[5]
+
+FILL(data[0], 0, 5)
+// data[0]~data[4] == 0
+```
+    """
+    return CALL('FILL', start, value, count)
+
+
+def SWAPB(source: AnyVariable[int], result: AnyVariable[int]) -> CALL:
+    """
+[Description]
+Exchanges the high-byte and low-byte data of a 16-bit (Word).
+
+[Usage]
+`SWAPB(source, result)`
+
+[Example]
+```
+short source = 0x1234, result
+
+SWAPB(source, result)
+// result == 0x3412
+```
+    """
+    return CALL('SWAPB', source, result)
+
+
+def SWAPW(source: AnyVariable[int], result: AnyVariable[int]) -> CALL:
+    """
+[Description]
+Exchanges the high-word and low-word data of a 32-bit (DINT).
+
+[Usage]
+`SWAPW(source, result)`
+
+[Example]
+```
+int source = 0x12345678, result
+
+SWAPW(source, result)
+// result == 0x56781234
+```
+    """
+    return CALL('SWAPW', source, result)
+
+
+def LOBYTE(source: AnyVariable[int]) -> EVAL[int]:
+    """
+[Description]
+Retrieves the low byte of a 16-bit source.
+
+[Usage]
+`result = LOBYTE(source)`
+
+[Example]
+```
+short source = 0x1234
+char result
+
+result = LOBYTE(source)
+// result == 0x34
+```
+    """
+    return EVAL('LOBYTE', source)
+
+
+def HIBYTE(source: AnyVariable[int]) -> EVAL[int]:
+    """
+[Description]
+Retrieves the high byte of a 16-bit source.
+
+[Usage]
+`result = HIBYTE(source)`
+
+[Example]
+```
+short source = 0x1234
+char result
+
+result = HIBYTE(source)
+// result == 0x12
+```
+    """
+    return EVAL('HIBYTE', source)
+
+
+def LOWORD(source: AnyVariable[int]) -> EVAL[int]:
+    """
+[Description]
+Retrieves the low word of a 32-bit source.
+
+[Usage]
+`result = LOWORD(source)`
+
+[Example]
+```
+int source = 0x12345678
+short result
+
+result = LOWORD(source)
+// result == 0x5678
+```
+    """
+    return EVAL('LOWORD', source)
+
+
+def HIWORD(source: AnyVariable[int]) -> EVAL[int]:
+    """
+[Description]
+Retrieves the high word of a 32-bit source.
+
+[Usage]
+`result = HIWORD(source)`
+
+[Example]
+```
+int source = 0x12345678
+short result
+
+result = HIWORD(source)
+// result == 0x1234
+```
+    """
+    return EVAL('HIWORD', source)
+
+
+def GETBIT(source: AnyVariable[int], bit_position: AnyInt) -> EVAL[int]:
+    """
+[Description]
+Gets the state of designated bit position of a data source.
+
+[Usage]
+`result = GETBIT(source, bit_position)`
+
+[Example]
+```
+short source = 0x000F
+short bit_position = 0, result
+
+result = GETBIT(source, bit_position)
+// result == 1
+```
+    """
+    return EVAL('GETBIT', source, bit_position)
+
+
+def SETBITON(source: AnyVariable[int], bit_position: AnyInt) -> CALL:
+    """
+[Description]
+Changes the state of designated bit position of a data source to 1.
+
+[Usage]
+`SETBITON(source, bit_position)`
+
+[Example]
+```
+short source = 0x0000
+short bit_position = 3
+
+SETBITON(source, bit_position)
+// source == 0x0008
+```
+    """
+    return CALL('SETBITON', source, bit_position)
+
+
+def SETBITOFF(source: AnyVariable[int], bit_position: AnyInt) -> CALL:
+    """
+[Description]
+Changes the state of designated bit position of a data source to 0.
+
+[Usage]
+`SETBITOFF(source, bit_position)`
+
+[Example]
+```
+short source = 0x000F
+short bit_position = 0
+
+SETBITOFF(source, bit_position)
+// source == 0x000E
+```
+    """
+    return CALL('SETBITOFF', source, bit_position)
+
+
+def INVBIT(source: AnyVariable[int], bit_position: AnyInt) -> CALL:
+    """
+[Description]
+Inverts the state of designated bit position of a data source.
+
+[Usage]
+`INVBIT(source, bit_position)`
+
+[Example]
+```
+short source = 0x0001
+short bit_position = 0
+
+INVBIT(source, bit_position)
+// source == 0x0000
+```
+    """
+    return CALL('INVBIT', source, bit_position)
+
+
+def XORSUM(start: VariableItem[int], result: AnyVariable[int], count: AnyInt) -> CALL:
+    """
+[Description]
+Use XOR to calculate checksum.
+
+[Usage]
+`XORSUM(source[start], result, count)`
+
+[Example]
+```
+char data[5] = {1, 2, 3, 4, 5}
+char checksum
+
+XORSUM(data[0], checksum, 5)
+```
+    """
+    return CALL('XORSUM', start, result, count)
+
+
+# ============================================================
+# DATA TYPE CONVERSION FUNCTIONS
+# ============================================================
+
+def FLOAT2ASCII(source: AnyVariable[float], result: VariableItem[int], count: AnyInt) -> CALL:
+    """
+[Description]
+Convert a floating point value to a string.
+
+[Usage]
+`FLOAT2ASCII(source, result[start], count)`
+
+[Example]
+```
+float source = 56.78
+char result[8]
+
+FLOAT2ASCII(source, result[0], 8)
+// result == "56.78"
+```
+    """
+    return CALL('FLOAT2ASCII', source, result, count)
+
+
+def DOUBLE2ASCII(source: AnyVariable[float], result: VariableItem[int], count: AnyInt) -> CALL:
+    """
+[Description]
+Convert a double value to a string.
+This function is only supported on cMT/cMT X models.
+
+[Usage]
+`DOUBLE2ASCII(source, result[start], count)`
+
+[Example]
+```
+double source = 56.78
+char result[8]
+
+DOUBLE2ASCII(source, result[0], 8)
+// result == "56.78"
+```
+    """
+    return CALL('DOUBLE2ASCII', source, result, count)
+
+
+def HEX2ASCII(source: AnyVariable[int], result: VariableItem[int], count: AnyInt) -> CALL:
+    """
+[Description]
+Convert a hexadecimal value to a string.
+
+[Usage]
+`HEX2ASCII(source, result[start], count)`
+
+[Example]
+```
+short source = 0x5678
+char result[4]
+
+HEX2ASCII(source, result[0], 4)
+// result[0] == '5', result[1] == '6', result[2] == '7', result[3] == '8'
+```
+    """
+    return CALL('HEX2ASCII', source, result, count)
+
+
+def StringDecAsc2Bin(source: AnyString, result: AnyVariable[int]) -> EVAL[bool]:
+    """
+[Description]
+Converts a decimal ASCII string to an integer.
+
+[Usage]
+`success = StringDecAsc2Bin(source[start], result)`
+`success = StringDecAsc2Bin("source", result)`
+
+[Example]
+```
+char src[5] = "1234"
+int result
+bool success
+
+success = StringDecAsc2Bin(src[0], result)
+// success == true, result == 1234
+```
+    """
+    return EVAL('StringDecAsc2Bin', source, result)
+
+
+def StringBin2DecAsc(source: AnyVariable[int], result: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Converts an integer to a decimal ASCII string.
+
+[Usage]
+`success = StringBin2DecAsc(source, result[start])`
+
+[Example]
+```
+int source = 1234
+char result[10]
+bool success
+
+success = StringBin2DecAsc(source, result[0])
+// success == true, result == "1234"
+```
+    """
+    return EVAL('StringBin2DecAsc', source, result)
+
+
+def StringDecAsc2Float(source: AnyString, result: AnyVariable[float]) -> EVAL[bool]:
+    """
+[Description]
+Converts a decimal ASCII string to a float value.
+
+[Usage]
+`success = StringDecAsc2Float(source[start], result)`
+`success = StringDecAsc2Float("source", result)`
+
+[Example]
+```
+char src[6] = "12.34"
+float result
+bool success
+
+success = StringDecAsc2Float(src[0], result)
+// success == true, result == 12.34
+```
+    """
+    return EVAL('StringDecAsc2Float', source, result)
+
+
+def StringFloat2DecAsc(source: AnyVariable[float], result: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Converts a float to a decimal ASCII string.
+
+[Usage]
+`success = StringFloat2DecAsc(source, result[start])`
+
+[Example]
+```
+float source = 12.34
+char result[10]
+bool success
+
+success = StringFloat2DecAsc(source, result[0])
+// success == true, result == "12.34"
+```
+    """
+    return EVAL('StringFloat2DecAsc', source, result)
+
+
+def StringHexAsc2Bin(source: AnyString, result: AnyVariable[int]) -> EVAL[bool]:
+    """
+[Description]
+Converts a hexadecimal ASCII string to binary data.
+
+[Usage]
+`success = StringHexAsc2Bin(source[start], result)`
+`success = StringHexAsc2Bin("source", result)`
+
+[Example]
+```
+char src[5] = "1A2B"
+short result
+bool success
+
+success = StringHexAsc2Bin(src[0], result)
+// success == true, result == 0x1A2B
+```
+    """
+    return EVAL('StringHexAsc2Bin', source, result)
+
+
+def StringBin2HexAsc(source: AnyVariable[int], result: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Converts binary data to a hexadecimal ASCII string.
+
+[Usage]
+`success = StringBin2HexAsc(source, result[start])`
+
+[Example]
+```
+short source = 0x1A2B
+char result[10]
+bool success
+
+success = StringBin2HexAsc(source, result[0])
+// success == true, result == "1A2B"
+```
+    """
+    return EVAL('StringBin2HexAsc', source, result)
+
+
+# ============================================================
+# STRING OPERATION FUNCTIONS
+# ============================================================
+
+def StringCompareNoCase(string1: AnyString, string2: AnyString) -> EVAL[bool]:
+    """
+[Description]
+Perform a case-insensitive comparison of two strings.
+
+[Usage]
+```
+ret = StringCompareNoCase(str1[start], str2[start])
+ret = StringCompareNoCase("string1", str2[start])
+ret = StringCompareNoCase(str1[start], "string2")
+ret = StringCompareNoCase("string1", "string2")
+```
+
+Returns true if the two strings are identical (ignoring case), false otherwise.
+
+[Example]
+```
+macro_command main()
+    char a[20]="abcde"
+    char b[20]="ABCDE"
+    bool ret
+
+    ret = StringCompareNoCase(a[0], b[0])
+    // ret == true (case-insensitive match)
+end macro_command
+```
+    """
+    return EVAL('StringCompareNoCase', string1, string2)
+
+
+def StringFind(source: AnyString, target: AnyString) -> EVAL[int]:
+    """
+[Description]
+Returns the zero-based index of the first character of the first occurrence
+of the target string in the source string. Returns -1 if not found.
+
+[Usage]
+```
+result = StringFind(source[start], target[start])
+result = StringFind(source[start], "target")
+result = StringFind("source", target[start])
+result = StringFind("source", "target")
+```
+
+[Example]
+```
+macro_command main()
+    char src[20] = "abcdefgh"
+    int result
+
+    result = StringFind(src[0], "cde")
+    // result == 2
+
+    result = StringFind(src[0], "xyz")
+    // result == -1
+end macro_command
+```
+    """
+    return EVAL('StringFind', source, target)
+
+
+def StringReverseFind(source: AnyString, target: AnyString) -> EVAL[int]:
+    """
+[Description]
+Returns the position of the last occurrence of the target string in the source
+string. Returns -1 if not found.
+
+[Usage]
+```
+result = StringReverseFind(source[start], target[start])
+result = StringReverseFind(source[start], "target")
+```
+
+[Example]
+```
+macro_command main()
+    char src[20] = "abcabcabc"
+    int result
+
+    result = StringReverseFind(src[0], "abc")
+    // result == 6
+end macro_command
+```
+    """
+    return EVAL('StringReverseFind', source, target)
+
+
+def StringFindOneOf(source: AnyString, target: AnyString) -> EVAL[int]:
+    """
+[Description]
+Returns the zero-based index of the first character in the source string
+that is also in the target string. Returns -1 if no match is found.
+
+[Usage]
+```
+result = StringFindOneOf(source[start], target[start])
+result = StringFindOneOf(source[start], "target")
+```
+
+[Example]
+```
+macro_command main()
+    char src[20] = "abcdefgh"
+    int result
+
+    result = StringFindOneOf(src[0], "xce")
+    // result == 2  (first match is 'c' at index 2)
+end macro_command
+```
+    """
+    return EVAL('StringFindOneOf', source, target)
+
+
+def StringIncluding(source: AnyString, set_str: AnyString, destination: VariableItem[int]) -> EVAL[int]:
+    """
+[Description]
+Retrieves a substring of the source string that contains characters in the
+set string, beginning with the first character in the source string and ending
+when a character is found in the source string that is not in the target string.
+
+[Usage]
+`result = StringIncluding(source[start], set[start], destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[20] = "abcxyz"
+    char set_chars[10] = "abc"
+    char dest[20]
+    int result
+
+    result = StringIncluding(src[0], set_chars[0], dest[0])
+    // dest == "abc", result == 3
+end macro_command
+```
+    """
+    return EVAL('StringIncluding', source, set_str, destination)
+
+
+def StringExcluding(source: AnyString, set_str: AnyString, destination: VariableItem[int]) -> EVAL[int]:
+    """
+[Description]
+Retrieves a substring of the source string that contains characters that are
+not in the set string.
+
+[Usage]
+`result = StringExcluding(source[start], set[start], destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[20] = "xyzabc"
+    char set_chars[10] = "abc"
+    char dest[20]
+    int result
+
+    result = StringExcluding(src[0], set_chars[0], dest[0])
+    // dest == "xyz", result == 3
+end macro_command
+```
+    """
+    return EVAL('StringExcluding', source, set_str, destination)
+
+
+def StringMid(source: AnyString, destination: VariableItem[int], offset: AnyInt, count: AnyInt) -> EVAL[bool]:
+    """
+[Description]
+Retrieves a character sequence from the specified offset of the source string.
+
+[Usage]
+`success = StringMid(source[start], destination[start], offset, count)`
+
+[Example]
+```
+macro_command main()
+    char src[20] = "abcdefghij"
+    char dest[10]
+    bool success
+
+    success = StringMid(src[0], dest[0], 3, 4)
+    // success == true, dest == "defg"
+end macro_command
+```
+    """
+    return EVAL('StringMid', source, destination, offset, count)
+
+
+def StringMD5(source: AnyString, destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Generates an MD5 hash string from the source string.
+
+[Usage]
+`success = StringMD5(source[start], destination[start])`
+`success = StringMD5("source", destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[20] = "hello"
+    char dest[33]
+    bool success
+
+    success = StringMD5(src[0], dest[0])
+    // dest contains the MD5 hex digest of "hello"
+end macro_command
+```
+    """
+    return EVAL('StringMD5', source, destination)
+
+
+def StringToUpper(source: AnyString, destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Converts all the characters in the source string to uppercase characters.
+
+[Usage]
+`success = StringToUpper(source[start], destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[10] = "abcde"
+    char dest[10]
+    bool success
+
+    success = StringToUpper(src[0], dest[0])
+    // success == true, dest == "ABCDE"
+end macro_command
+```
+    """
+    return EVAL('StringToUpper', source, destination)
+
+
+def StringToLower(source: AnyString, destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Converts all the characters in the source string to lowercase characters.
+
+[Usage]
+`success = StringToLower(source[start], destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[10] = "ABCDE"
+    char dest[10]
+    bool success
+
+    success = StringToLower(src[0], dest[0])
+    // success == true, dest == "abcde"
+end macro_command
+```
+    """
+    return EVAL('StringToLower', source, destination)
+
+
+def StringToReverse(source: AnyString, destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Reverses the characters in the source string.
+
+[Usage]
+`success = StringToReverse(source[start], destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[10] = "abcde"
+    char dest[10]
+    bool success
+
+    success = StringToReverse(src[0], dest[0])
+    // success == true, dest == "edcba"
+end macro_command
+```
+    """
+    return EVAL('StringToReverse', source, destination)
+
+
+def StringTrimLeft(source: AnyString, set_str: AnyString, destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Trims the leading specified characters in the set buffer from the source string.
+
+[Usage]
+`success = StringTrimLeft(source[start], set[start], destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[20] = "   abcde"
+    char set_chars[5] = " "
+    char dest[20]
+    bool success
+
+    success = StringTrimLeft(src[0], set_chars[0], dest[0])
+    // success == true, dest == "abcde"
+end macro_command
+```
+    """
+    return EVAL('StringTrimLeft', source, set_str, destination)
+
+
+def StringTrimRight(source: AnyString, set_str: AnyString, destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Trims the trailing specified characters in the set buffer from the source string.
+
+[Usage]
+`success = StringTrimRight(source[start], set[start], destination[start])`
+
+[Example]
+```
+macro_command main()
+    char src[20] = "abcde   "
+    char set_chars[5] = " "
+    char dest[20]
+    bool success
+
+    success = StringTrimRight(src[0], set_chars[0], dest[0])
+    // success == true, dest == "abcde"
+end macro_command
+```
+    """
+    return EVAL('StringTrimRight', source, set_str, destination)
+
+
+def StringInsert(source: AnyString, destination: VariableItem[int], offset: AnyInt) -> EVAL[bool]:
+    """
+[Description]
+Inserts a string in a specific location within the destination string content.
+
+[Usage]
+`success = StringInsert(source[start], destination[start], offset)`
+`success = StringInsert("source", destination[start], offset)`
+
+[Example]
+```
+macro_command main()
+    char src[10] = "XYZ"
+    char dest[20] = "abcde"
+    bool success
+
+    success = StringInsert(src[0], dest[0], 2)
+    // success == true, dest == "abXYZcde"
+end macro_command
+```
+    """
+    return EVAL('StringInsert', source, destination, offset)
+
+
+# ============================================================
+# UNICODE FUNCTIONS
+# ============================================================
+
+def Unicode2Utf8(source: VariableItem[int], destination: VariableItem[int]) -> EVAL[int]:
+    """
+[Description]
+Converts a Unicode string to a UTF-8 string.
+
+[Usage]
+`result = Unicode2Utf8(source[start], destination[start])`
+
+[Example]
+```
+char src[20]
+char dest[40]
+int result
+
+// assume src contains a Unicode string
+result = Unicode2Utf8(src[0], dest[0])
+// result contains the length of the converted UTF-8 string
+```
+    """
+    return EVAL('Unicode2Utf8', source, destination)
+
+
+def Utf82Unicode(source: AnyString, destination: VariableItem[int]) -> EVAL[int]:
+    """
+[Description]
+Converts a UTF-8 string to a Unicode string.
+
+[Usage]
+`result = Utf82Unicode(source[start], destination[start])`
+
+[Example]
+```
+char src[40]
+char dest[20]
+int result
+
+result = Utf82Unicode(src[0], dest[0])
+// result contains the length of the converted Unicode string
+```
+    """
+    return EVAL('Utf82Unicode', source, destination)
+
+
+def UnicodeCat(source: VariableItem[int], destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Concatenates two Unicode strings (appends source to destination).
+
+[Usage]
+`success = UnicodeCat(source[start], destination[start])`
+
+[Example]
+```
+char src[20]
+char dest[40]
+bool success
+
+success = UnicodeCat(src[0], dest[0])
+```
+    """
+    return EVAL('UnicodeCat', source, destination)
+
+
+def UnicodeCompare(string1: VariableItem[int], string2: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Performs a case-sensitive comparison between two Unicode strings.
+Returns true if identical, false otherwise.
+
+[Usage]
+`ret = UnicodeCompare(str1[start], str2[start])`
+
+[Example]
+```
+char a[20]
+char b[20]
+bool ret
+
+ret = UnicodeCompare(a[0], b[0])
+```
+    """
+    return EVAL('UnicodeCompare', string1, string2)
+
+
+def UnicodeCopy(source: VariableItem[int], destination: VariableItem[int]) -> EVAL[bool]:
+    """
+[Description]
+Copies a Unicode string to another buffer.
+
+[Usage]
+`success = UnicodeCopy(source[start], destination[start])`
+
+[Example]
+```
+char src[20]
+char dest[20]
+bool success
+
+success = UnicodeCopy(src[0], dest[0])
+```
+    """
+    return EVAL('UnicodeCopy', source, destination)
+
+
+def UnicodeExcluding(source: VariableItem[int], set_str: VariableItem[int], destination: VariableItem[int]) -> EVAL[int]:
+    """
+[Description]
+Retrieves a substring of the Unicode source string that contains characters
+that are not in the set string.
+
+[Usage]
+`result = UnicodeExcluding(source[start], set[start], destination[start])`
+
+[Example]
+```
+char src[20]
+char set_chars[10]
+char dest[20]
+int result
+
+result = UnicodeExcluding(src[0], set_chars[0], dest[0])
+```
+    """
+    return EVAL('UnicodeExcluding', source, set_str, destination)
+
+
+def UnicodeLength(source: VariableItem[int]) -> EVAL[int]:
+    """
+[Description]
+Obtains the length of a Unicode string.
+
+[Usage]
+`result = UnicodeLength(source[start])`
+
+[Example]
+```
+char src[20]
+int result
+
+result = UnicodeLength(src[0])
+// result contains the number of Unicode characters
+```
+    """
+    return EVAL('UnicodeLength', source)
+
+
+# ============================================================
+# MATHEMATICS FUNCTIONS
+# ============================================================
+
+def SQRT(source: AnyValue[DT], result: AnyVariable[DT]) -> CALL:
+    """
+[Description]
+The result is equal to the square root of the source.
+
+[Usage]
+`SQRT(source, result)`
+
+[Example]
+```
+float source = 9, result
+
+SQRT(source, result)
+// result == 3
+```
+    """
+    return CALL('SQRT', source, result)
+
+
+def SIN(source: AnyVariable[DT], result: AnyVariable[DT]) -> CALL:
+    """
+[Description]
+The result is equal to the sine of the source.
+
+[Usage]
+`SIN(source, result)`
+
+[Example]
+```
+float source = 30, result
+
+SIN(source, result)
+// result == 0.5
+SIN(90, result)
+// result == 1
+```
+    """
+    return CALL('SIN', source, result)
+
+
+def TAN(source: AnyVariable[DT], result: AnyVariable[DT]) -> CALL:
+    """
+[Description]
+The result is equal to the tangent of the source.
+
+[Usage]
+`TAN(source, result)`
+
+[Example]
+```
+float source = 45, result
+
+TAN(source, result)
+// result == 1
+```
+    """
+    return CALL('TAN', source, result)
+
+
+def SEC(source: AnyVariable[DT], result: AnyVariable[DT]) -> CALL:
+    """
+[Description]
+The result is equal to the secant of the source.
+
+[Usage]
+`SEC(source, result)`
+
+[Example]
+```
+float source = 60, result
+
+SEC(source, result)
+// result == 2
+```
+    """
+    return CALL('SEC', source, result)
+
+
+def LOG(source: AnyValue[DT], result: AnyVariable[DT]) -> CALL:
+    """
+[Description]
+The result is equal to the natural logarithm of the source.
+
+[Usage]
+`LOG(source, result)`
+
+[Example]
+```
+float source = 2.718281828, result
+
+LOG(source, result)
+// result == 1
+```
+    """
+    return CALL('LOG', source, result)
+
+
+def LOG10(source: AnyValue[DT], result: AnyVariable[DT]) -> CALL:
+    """
+[Description]
+The result is equal to the base-10 logarithm of the source.
+
+[Usage]
+`LOG10(source, result)`
+
+[Example]
+```
+float source = 100, result
+
+LOG10(source, result)
+// result == 2
+```
+    """
+    return CALL('LOG10', source, result)
+
+
+def RAND(min_val: AnyInt, max_val: AnyInt, result: AnyVariable[int]) -> CALL:
+    """
+[Description]
+Calculates a random integer between min and max (inclusive).
+
+[Usage]
+`RAND(min, max, result)`
+
+[Example]
+```
+int result
+
+RAND(1, 100, result)
+// result is a random integer between 1 and 100
+```
+    """
+    return CALL('RAND', min_val, max_val, result)
+
+
+def FLOOR(source: AnyFloat) -> EVAL[float]:
+    """
+[Description]
+Get the largest integral value that is not greater than input.
+
+[Usage]
+`result = FLOOR(source)`
+
+[Example]
+```
+float x = 3.2
+int result
+
+result = FLOOR(x)
+// result == 3
+```
+    """
+    return EVAL('FLOOR', source)
+
+
+def ROUND(source: AnyFloat) -> EVAL[float]:
+    """
+[Description]
+Get the integral value that is nearest to the input.
+
+[Usage]
+`result = ROUND(source)`
+
+[Example]
+```
+float x = 3.5
+int result
+
+result = ROUND(x)
+// result == 4
+```
+    """
+    return EVAL('ROUND', source)
+
+
+def POW(base: AnyValue[DT], exponent: AnyValue[DT], result: AnyVariable[DT]) -> CALL:
+    """
+[Description]
+The result is equal to base raised to the power of exponent.
+
+[Usage]
+`POW(base, exponent, result)`
+
+[Example]
+```
+float base = 2, exponent = 8, result
+
+POW(base, exponent, result)
+// result == 256
+```
+    """
+    return CALL('POW', base, exponent, result)
+
+
+# ============================================================
+# STATISTICS FUNCTIONS
+# ============================================================
+
+def HARMEAN(start: VariableItem[DT], result: AnyVariable[DT], count: AnyInt) -> CALL:
+    """
+[Description]
+Get the harmonic mean value from an array.
+
+[Usage]
+`HARMEAN(source[start], result, count)`
+
+[Example]
+```
+float data[4] = {1, 2, 4, 4}
+float result
+
+HARMEAN(data[0], result, 4)
+// result == 2
+```
+    """
+    return CALL('HARMEAN', start, result, count)
+
+
+def MEDIAN(start: VariableItem[DT], result: AnyVariable[DT], count: AnyInt) -> CALL:
+    """
+[Description]
+Get the median value from an array.
+
+[Usage]
+`MEDIAN(source[start], result, count)`
+
+[Example]
+```
+int data[5] = {1, 2, 3, 4, 5}
+float result
+
+MEDIAN(data[0], result, 5)
+// result == 3
+```
+    """
+    return CALL('MEDIAN', start, result, count)
+
+
+def STDEVP(start: VariableItem[DT], result: AnyVariable[DT], count: AnyInt) -> CALL:
+    """
+[Description]
+Get the population standard deviation value from an array.
+
+[Usage]
+`STDEVP(source[start], result, count)`
+
+[Example]
+```
+float data[5] = {2, 4, 4, 4, 5}
+float result
+
+STDEVP(data[0], result, 5)
+// result == approximately 0.894
+```
+    """
+    return CALL('STDEVP', start, result, count)
+
+
+def STDEVS(start: VariableItem[DT], result: AnyVariable[DT], count: AnyInt) -> CALL:
+    """
+[Description]
+Get the sample standard deviation value from an array.
+
+[Usage]
+`STDEVS(source[start], result, count)`
+
+[Example]
+```
+float data[5] = {2, 4, 4, 4, 5}
+float result
+
+STDEVS(data[0], result, 5)
+// result == approximately 1.0
+```
+    """
+    return CALL('STDEVS', start, result, count)
+
+
+# ============================================================
+# FREE PROTOCOL FUNCTIONS
+# ============================================================
+
+def SetRTS(state: AnyVariable[int]) -> CALL:
+    """
+[Description]
+Raises or lowers the RTS signal of RS-232.
+
+[Usage]
+`SetRTS(on_off)`
+
+on_off: 1 to raise RTS, 0 to lower RTS.
+
+[Example]
+```
+SetRTS(1)  // raise RTS
+DELAY(10)
+SetRTS(0)  // lower RTS
+```
+    """
+    return CALL('SetRTS', state)
+
+
+def GetCTS(result: AnyVariable[int]) -> CALL:
+    """
+[Description]
+Gets the CTS signal state of RS-232.
+
+[Usage]
+`GetCTS(result)`
+
+result is set to 1 if CTS is high, 0 if CTS is low.
+
+[Example]
+```
+short cts_state
+
+GetCTS(cts_state)
+// cts_state == 1 if CTS is high
+```
+    """
+    return CALL('GetCTS', result)
+
+
+def INPORT(port: AnyInt, start: VariableItem[int], count: AnyInt, timeout: AnyInt) -> CALL:
+    """
+[Description]
+Reads data from a COM port or Ethernet port.
+
+[Usage]
+`INPORT(port_number, destination[start], count, timeout)`
+
+port_number: COM port number or Ethernet port number.
+count: number of bytes to read.
+timeout: timeout in ms.
+
+[Example]
+```
+char buffer[10]
+short port = 1
+
+INPORT(port, buffer[0], 10, 1000)
+// read 10 bytes from port 1, timeout 1000ms
+```
+    """
+    return CALL('INPORT', port, start, count, timeout)
+
+
+def INPORT2(port: AnyInt, start: VariableItem[int], count: AnyInt, timeout: AnyInt, wait: AnyInt) -> CALL:
+    """
+[Description]
+Reads data from a COM port or Ethernet port and then waits for
+the designated period of time.
+
+[Usage]
+`INPORT2(port_number, destination[start], count, timeout, wait_time)`
+
+[Example]
+```
+char buffer[10]
+short port = 1
+
+INPORT2(port, buffer[0], 10, 1000, 500)
+// read up to 10 bytes from port 1, timeout 1000ms, then wait 500ms
+```
+    """
+    return CALL('INPORT2', port, start, count, timeout, wait)
+
+
+def INPORT3(port: AnyInt, start: VariableItem[int], count: AnyInt, timeout: AnyInt) -> CALL:
+    """
+[Description]
+Reads data from a COM port or Ethernet port according to the specified data size.
+This function waits until exactly `count` bytes have been received or timeout occurs.
+
+[Usage]
+`INPORT3(port_number, destination[start], count, timeout)`
+
+[Example]
+```
+char buffer[10]
+short port = 1
+
+INPORT3(port, buffer[0], 10, 1000)
+// read exactly 10 bytes from port 1, timeout 1000ms
+```
+    """
+    return CALL('INPORT3', port, start, count, timeout)
+
+
+def INPORT4(port: AnyInt, start: VariableItem[int], count: AnyInt, timeout: AnyInt, end_char: AnyInt) -> CALL:
+    """
+[Description]
+Reads data from a COM port or Ethernet port and then stops reading
+when the ending character is reached.
+
+[Usage]
+`INPORT4(port_number, destination[start], count, timeout, end_char)`
+
+[Example]
+```
+char buffer[20]
+short port = 1
+
+INPORT4(port, buffer[0], 20, 1000, 0x0D)
+// read from port 1, stop at CR (0x0D), max 20 bytes, timeout 1000ms
+```
+    """
+    return CALL('INPORT4', port, start, count, timeout, end_char)
+
+
+def OUTPORT(port: AnyInt, start: VariableItem[int], count: AnyInt) -> CALL:
+    """
+[Description]
+Sends out the specified data to a device or controller via a COM port or
+Ethernet port.
+
+[Usage]
+`OUTPORT(port_number, source[start], count)`
+
+[Example]
+```
+char send_buf[5] = {0x01, 0x03, 0x00, 0x00, 0x00}
+short port = 1
+
+OUTPORT(port, send_buf[0], 5)
+// send 5 bytes out to port 1
+```
+    """
+    return CALL('OUTPORT', port, start, count)
+
+
+def PURGE(port: AnyInt) -> CALL:
+    """
+[Description]
+Clears the input and output buffers associated with the COM port.
+
+[Usage]
+`PURGE(port_number)`
+
+[Example]
+```
+short port = 1
+
+PURGE(port)
+// clear COM port 1 buffers
+```
+    """
+    return CALL('PURGE', port)
+
+
+# ============================================================
+# DATA SAMPLING / EVENT LOG FUNCTIONS
+# ============================================================
+
+def FindDataSamplingDate(
+    data_sampling_name: str,
+    year: AnyVariable[int],
+    month: AnyVariable[int],
+    day: AnyVariable[int],
+    direction: AnyInt,
+    result: AnyVariable[int]
+) -> CALL:
+    """
+[Description]
+Find a data sampling record by date.
+
+[Usage]
+`FindDataSamplingDate(data_sampling_name, year, month, day, direction, result)`
+
+direction: 0 = find forward, 1 = find backward.
+result: index of the found record, or -1 if not found.
+
+[Example]
+```
+short year = 2023, month = 6, day = 15
+int result
+
+FindDataSamplingDate("MySampling", year, month, day, 0, result)
+```
+    """
+    return CALL(
+        'FindDataSamplingDate',
+        ensure_string_is_literal(data_sampling_name),
+        year, month, day, direction, result
+    )
+
+
+def FindDataSamplingIndex(
+    data_sampling_name: str,
+    index: AnyVariable[int],
+    result: AnyVariable[int]
+) -> CALL:
+    """
+[Description]
+Find a data sampling record by index.
+
+[Usage]
+`FindDataSamplingIndex(data_sampling_name, index, result)`
+
+result: 1 if the record exists, 0 otherwise.
+
+[Example]
+```
+int index = 5, result
+
+FindDataSamplingIndex("MySampling", index, result)
+```
+    """
+    return CALL(
+        'FindDataSamplingIndex',
+        ensure_string_is_literal(data_sampling_name),
+        index, result
+    )
+
+
+def FindEventLogDate(
+    event_log_name: str,
+    year: AnyVariable[int],
+    month: AnyVariable[int],
+    day: AnyVariable[int],
+    direction: AnyInt,
+    result: AnyVariable[int]
+) -> CALL:
+    """
+[Description]
+Find an event log record by date.
+
+[Usage]
+`FindEventLogDate(event_log_name, year, month, day, direction, result)`
+
+direction: 0 = find forward, 1 = find backward.
+result: index of the found record, or -1 if not found.
+
+[Example]
+```
+short year = 2023, month = 6, day = 15
+int result
+
+FindEventLogDate("MyEventLog", year, month, day, 0, result)
+```
+    """
+    return CALL(
+        'FindEventLogDate',
+        ensure_string_is_literal(event_log_name),
+        year, month, day, direction, result
+    )
+
+
+def FindEventLogIndex(
+    event_log_name: str,
+    index: AnyVariable[int],
+    result: AnyVariable[int]
+) -> CALL:
+    """
+[Description]
+Find an event log record by index.
+
+[Usage]
+`FindEventLogIndex(event_log_name, index, result)`
+
+result: 1 if the record exists, 0 otherwise.
+
+[Example]
+```
+int index = 5, result
+
+FindEventLogIndex("MyEventLog", index, result)
+```
+    """
+    return CALL(
+        'FindEventLogIndex',
+        ensure_string_is_literal(event_log_name),
+        index, result
+    )
+
+
+# ============================================================
+# MISCELLANEOUS FUNCTIONS
+# ============================================================
+
+def GetCnvTagArrayIndex(tag_name: str, result: AnyVariable[int]) -> CALL:
+    """
+[Description]
+Gets the array index of a conversion tag.
+
+[Usage]
+`GetCnvTagArrayIndex(tag_name, result)`
+
+[Example]
+```
+int index
+
+GetCnvTagArrayIndex("MyTag", index)
+```
+    """
+    return CALL('GetCnvTagArrayIndex', ensure_string_is_literal(tag_name), result)

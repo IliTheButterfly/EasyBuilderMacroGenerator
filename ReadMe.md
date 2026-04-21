@@ -15,7 +15,7 @@ This project aims to make integration with other systems easier. Notably, the ma
 
 ## Usage
 
-First install [python](https://www.python.org/downloads/).
+First install [python](https://www.python.org/downloads/) (Python 3.9 or newer).
 
 Once installed, make a venv (virtual environment):
 
@@ -38,6 +38,20 @@ pip install git+https://github.com/IliTheButterfly/EasyBuilderMacroGenerator.git
 ```
 
 Then follow the instructions in [Getting started](docs/api/01-getting-started.md).
+
+## Running tests
+
+Create and activate a virtual environment (same as the setup instructions above), then install development dependencies and run pytest:
+
+```sh
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+pytest
+```
+
+VS Code is preconfigured in `.vscode/settings.json` to run pytest from the repository root with the `src/` layout. Open the Testing panel and click **Run Tests**.
+
+If VS Code shows `No module named pytest`, your selected interpreter is missing test dependencies. Install them in that same environment with `pip install -e ".[dev]"` (or `pip install pytest`).
 
 ## TODO
 - [ ] Fix issue with C_IF where variables only used within C_... will not be processed and therefore not added to the variable list

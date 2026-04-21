@@ -1,7 +1,7 @@
 import io
 
-from src.eb_macro_gen.instructions import ACOS, ASYNC_TRIG_MACRO, BCD2BIN
-from src.eb_macro_gen.syntax import C_ELIF, C_END_IF, C_IF, C_ELSE, COMMENT, IF, Macro, vfloat, vint, vshort
+from eb_macro_gen.instructions import ACOS, ASYNC_TRIG_MACRO, BCD2BIN
+from eb_macro_gen.syntax import C_ELIF, C_END_IF, C_IF, C_ELSE, COMMENT, IF, Macro, vfloat, vint, vshort
 
 
 def render_macro(macro: Macro) -> str:

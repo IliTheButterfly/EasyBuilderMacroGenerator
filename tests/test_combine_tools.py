@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from eb_macro_gen.tools.combine_tags import main as combine_tags_main
 from eb_macro_gen.tools.io import load_eb_tags
@@ -28,7 +29,7 @@ def _run_combine(base: Path, incoming: Path, output: Path) -> None:
         sys.argv = prev_argv
 
 
-def _run_koyo_import(koyo_csv: Path, output: Path, append: Path | None = None) -> None:
+def _run_koyo_import(koyo_csv: Path, output: Path, append: Optional[Path] = None) -> None:
     import sys
 
     args = [

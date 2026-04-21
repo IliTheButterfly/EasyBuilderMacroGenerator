@@ -1,5 +1,5 @@
-from src.eb_macro_gen.objects import *
-from src.eb_macro_gen.dynamic_drawing import *
+from eb_macro_gen.objects import *
+from eb_macro_gen.dynamic_drawing import *
 
 def test_routine():
     macro = Macro("test_routine", "Test the routine Statement")

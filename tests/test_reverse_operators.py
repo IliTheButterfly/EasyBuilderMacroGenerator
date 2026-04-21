@@ -1,4 +1,4 @@
-from src.eb_macro_gen.syntax import EVAL, vint, vint_arr
+from eb_macro_gen.syntax import EVAL, vint, vint_arr
 
 
 def test_reverse_operators_variable():

@@ -10,7 +10,7 @@ authors = [
 ]
 description = "An API to allow generating EasyBuilder Pro macros"
 readme = "ReadMe.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 classifiers = [
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
@@ -21,6 +21,11 @@ dependencies = [
   "pyperclip",
   "db-sqlite3",
 ]
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+]
+
 [project.scripts]
 koyo-tags-import = "eb_macro_gen.tools.koyo_tags_import:main"
 combine-tags = "eb_macro_gen.tools.combine_tags:main"
@@ -35,3 +40,7 @@ include = [
 [project.urls]
 Homepage = "https://github.com/IliTheButterfly/EasyBuilderMacroGnerator"
 Issues = "https://github.com/IliTheButterfly/EasyBuilderMacroGnerator/issues"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

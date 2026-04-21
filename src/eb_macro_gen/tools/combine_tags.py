@@ -6,77 +6,116 @@ import sys
 
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
+from eb_macro_gen.tools.io import load_eb_tags, save_eb_tags
+from eb_macro_gen.tools.merge import (
+    ConflictStrategy,
+    merge_eb_tags,
+    merge_eb_tags_interactive,
+)
+from eb_macro_gen.tools.reporting import ConflictReport
 
-from eb_macro_gen.common import PromptResult, prompt_yna
-from eb_macro_gen.objects import EasyBuilderTag, EasyBuilderTagList
-    
-    
+_SHOW_HELP = (
+    "Filter which conflict groups to display. "
+    "One or more of: address, name, replaced, skipped, all, none. "
+    "Default when --dry-run is set: all. "
+    "Default otherwise: none (use --show or --dry-run to see conflicts). "
+    "Combine filters freely, e.g. --show address skipped."
+)
+
+
 def main():
-    argv = sys.argv
-    parser = ArgumentParser("combine_tags")
-    parser.add_argument("file1_csv", help="Original easy builder exported tags csv to append the tags to")
-    parser.add_argument("file2_csv", help="Original easy builder exported tags csv to append the tags to")
-    parser.add_argument("output_file_csv", help="The csv file to export the tags")
-    parser.add_argument("-f", "--force", action="store_true", help="Non-interactive")
-    
-    args = parser.parse_args(argv[1:])
-    
-    output_file = Path(args.output_file_csv)
-    file1 = Path(args.file1_csv)
-    file2 = Path(args.file2_csv)
-    
-    ebTags = EasyBuilderTagList()
-    ebTags2 = EasyBuilderTagList()
-            
-    if file1 is not None:
-        with file1.open('r') as rd:
-            ebTags.read(rd)
-            
-    if file2 is not None:
-        with file2.open('r') as rd:
-            ebTags2.read(rd)
+    parser = ArgumentParser(
+        "combine_tags",
+        description="Merge two EasyBuilder tag CSV exports into one.",
+    )
+    parser.add_argument("file1_csv", help="Base EasyBuilder tag CSV")
+    parser.add_argument("file2_csv", help="Incoming EasyBuilder tag CSV to merge in")
+    parser.add_argument("output_file_csv", help="Destination CSV file")
+    parser.add_argument(
+        "-f", "--force",
+        action="store_true",
+        help="Non-interactive: resolve all conflicts using --strategy without prompting",
+    )
+    parser.add_argument(
+        "--strategy",
+        choices=[s.value for s in ConflictStrategy],
+        default=ConflictStrategy.SKIP.value,
+        help=(
+            "Conflict resolution strategy when --force is set (default: skip). "
+            "skip=keep existing, replace=incoming wins on both keys, "
+            "replace-address=incoming wins on address only, "
+            "replace-name=incoming wins on name only."
+        ),
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help=(
+            "Show conflicts and summary without writing the output file. "
+            "Implies --show all unless --show is specified explicitly."
+        ),
+    )
+    parser.add_argument(
+        "--show",
+        nargs="+",
+        choices=(*ConflictReport.SHOW_CHOICES, "none"),
+        default=None,
+        metavar="FILTER",
+        help=_SHOW_HELP,
+    )
+    parser.add_argument(
+        "--truncate",
+        type=int,
+        default=0,
+        metavar="N",
+        help="Show at most N rows per conflict group, then '… and M more'. 0 = no limit.",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help=(
+            "Include identical duplicates (same name and address on both sides) "
+            "in the conflict table. These are hidden by default as they carry no "
+            "actionable information."
+        ),
+    )
 
-    replace_all_tags = False
-    replace_no_tags = False
-    replace_all_names = False
-    replace_no_names = False
-    for key1, key2, tag in iter(ebTags2.map):
-        tag:EasyBuilderTag
-        
-        if tag in ebTags:
-            if key2 in ebTags.map:
-                e = False
-                if not (replace_all_names or replace_no_names):
-                    r = prompt_yna(f"A tag with the name '{tag.Name}' already exists. Replace it?")
-                    if r == PromptResult.ALL:
-                        replace_all_names = True
-                    if r == PromptResult.NONE:
-                        replace_no_names = True
-                    if r == PromptResult.YES:
-                        e = True
-                if (e or replace_all_names) and not replace_no_names:
-                    ebTags.map.remove_from_key2(key2)
-            if key1 in ebTags.map:
-                e = False
-                if not (replace_all_tags or replace_no_tags):
-                    r = prompt_yna(f"A tag with the address '{tag.Address},{tag.Host}' already exists. Replace it ({ebTags.map.get_from_key1(key1).Name} -> {tag.Name})?")
-                    if r == PromptResult.ALL:
-                        replace_all_tags = True
-                    if r == PromptResult.NONE:
-                        replace_no_tags = True
-                    if r == PromptResult.YES:
-                        e = True
-                if (e or replace_all_tags) and not replace_no_tags:
-                    ebTags.map.remove_from_key1(key1)
-        if ebTags.add(tag):
-            print(f"Added {repr(tag)}")
-        else:
-            print(f"Skipped {repr(tag)}")
-                
-    with output_file.open('+w') as wr:
-        for _, __, tag in iter(ebTags.map):
-            tag:EasyBuilderTag
-            wr.write(f"{tag.export()}\n")
+    args = parser.parse_args(sys.argv[1:])
+
+    base     = load_eb_tags(args.file1_csv)
+    incoming = load_eb_tags(args.file2_csv)
+
+    report = ConflictReport()
+
+    if args.force:
+        strategy = ConflictStrategy(args.strategy)
+        merged, result = merge_eb_tags(base, incoming, strategy=strategy, on_conflict=report.record)
+    else:
+        merged, result = merge_eb_tags_interactive(base, incoming)
+
+    # Resolve effective --show:
+    #   explicit --show always wins
+    #   --dry-run with no --show → show all
+    #   normal run with no --show → none
+    if args.show is not None:
+        show = set(args.show)
+    elif args.dry_run:
+        show = {"all"}
+    else:
+        show = {"none"}
+
+    if "none" not in show:
+        report.print(show=show, truncate=args.truncate, verbose=args.verbose)
+
+    print("Merge summary:")
+    print(result)
+
+    if not args.dry_run:
+        save_eb_tags(merged, args.output_file_csv)
+        print(f"\nWritten to {args.output_file_csv}")
+    else:
+        print("\n(Dry run — no file written)")
+
 
 if __name__ == "__main__":
     main()

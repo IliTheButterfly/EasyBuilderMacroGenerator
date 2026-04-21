@@ -15,7 +15,7 @@ This project aims to make integration with other systems easier. Notably, the ma
 
 ## Usage
 
-First install [python](https://www.python.org/downloads/) (Python 3.12 or newer).
+First install [python](https://www.python.org/downloads/) (Python 3.9 or newer).
 
 Once installed, make a venv (virtual environment):
 

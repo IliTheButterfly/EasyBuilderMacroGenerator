@@ -1,6 +1,11 @@
 from __future__ import annotations
 from abc import abstractmethod
-from typing import IO, Dict, override
+from typing import IO, Dict
+
+try:
+    from typing import override
+except ImportError:
+    from typing_extensions import override
 from .instructions import *
 from .common import DoubleKeyMap, smart_split
 from dataclasses import dataclass
@@ -45,25 +50,16 @@ EB_DT_MAP:Dict[str, DataType] = {
     
 def is_int(v:Union[DataType, str, Variable, VariableItem, Tag, int]) -> bool:
     if isinstance(v, DataType):
-        match v:
-            case DataType.BCD16:
-                return True
-            case DataType.BCD32:
-                return True
-            case DataType.U16:
-                return True
-            case DataType.S16:
-                return True
-            case DataType.U32:
-                return True
-            case DataType.S32:
-                return True
-            case DataType.U64:
-                return True
-            case DataType.S64:
-                return True
-            case _:
-                return False
+        return v in {
+            DataType.BCD16,
+            DataType.BCD32,
+            DataType.U16,
+            DataType.S16,
+            DataType.U32,
+            DataType.S32,
+            DataType.U64,
+            DataType.S64,
+        }
     if isinstance(v, str):
         return "char" in v or "short" in v or "int" in v or "long" in v
     if isinstance(v, (Variable, VariableItem)):
@@ -75,13 +71,7 @@ def is_int(v:Union[DataType, str, Variable, VariableItem, Tag, int]) -> bool:
     
 def is_float(v:Union[DataType, str, Variable, VariableItem, Tag, float]) -> bool:
     if isinstance(v, DataType):
-        match v:
-            case DataType.F32:
-                return True
-            case DataType.F64:
-                return True
-            case _:
-                return False
+        return v in {DataType.F32, DataType.F64}
     if isinstance(v, str):
         return "float" in v or "double" in v
     if isinstance(v, (Variable, VariableItem)):

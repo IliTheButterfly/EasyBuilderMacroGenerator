@@ -2,7 +2,12 @@ from __future__ import annotations
 from enum import Enum
 from collections import deque
 from itertools import repeat
-from typing import IO, Any, Callable, Generic, List, Literal, Optional, Set, TextIO, Tuple, TypeAlias, TypeVar, Union, overload
+from typing import IO, Any, Callable, Generic, List, Literal, Optional, Set, TextIO, Tuple, TypeVar, Union, overload
+
+try:
+    from typing import TypeAlias
+except ImportError:
+    from typing_extensions import TypeAlias
 
 DT = TypeVar('DT')
 

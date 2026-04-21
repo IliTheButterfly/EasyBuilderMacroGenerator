@@ -688,9 +688,23 @@ class EXPRESSION(Resource):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rsub__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} - {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __add__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} + {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+
+    def __radd__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} + {str(self)}')
         res.resources.add(self)
         if isinstance(o, Resource):
             res.resources.add(o)
@@ -702,6 +716,13 @@ class EXPRESSION(Resource):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rmul__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} * {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __truediv__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} / {str(deboolify(o))}')
@@ -709,9 +730,23 @@ class EXPRESSION(Resource):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rtruediv__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} / {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __mod__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} % {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+
+    def __rmod__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} % {str(self)}')
         res.resources.add(self)
         if isinstance(o, Resource):
             res.resources.add(o)
@@ -933,9 +968,23 @@ class Variable(Resource, Generic[DT]):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rsub__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} - {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __add__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} + {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+
+    def __radd__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} + {str(self)}')
         res.resources.add(self)
         if isinstance(o, Resource):
             res.resources.add(o)
@@ -947,6 +996,13 @@ class Variable(Resource, Generic[DT]):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rmul__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} * {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __truediv__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} / {str(deboolify(o))}')
@@ -954,9 +1010,23 @@ class Variable(Resource, Generic[DT]):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rtruediv__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} / {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __mod__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} % {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+
+    def __rmod__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} % {str(self)}')
         res.resources.add(self)
         if isinstance(o, Resource):
             res.resources.add(o)
@@ -1052,9 +1122,23 @@ class VariableItem(Resource, Generic[DT]):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rsub__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} - {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __add__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} + {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+
+    def __radd__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} + {str(self)}')
         res.resources.add(self)
         if isinstance(o, Resource):
             res.resources.add(o)
@@ -1066,6 +1150,13 @@ class VariableItem(Resource, Generic[DT]):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rmul__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} * {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __truediv__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} / {str(deboolify(o))}')
@@ -1073,9 +1164,23 @@ class VariableItem(Resource, Generic[DT]):
         if isinstance(o, Resource):
             res.resources.add(o)
         return res
+
+    def __rtruediv__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} / {str(self)}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
     
     def __mod__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} % {str(deboolify(o))}')
+        res.resources.add(self)
+        if isinstance(o, Resource):
+            res.resources.add(o)
+        return res
+
+    def __rmod__(self, o) -> LITERAL:
+        res = LITERAL(f'{str(deboolify(o))} % {str(self)}')
         res.resources.add(self)
         if isinstance(o, Resource):
             res.resources.add(o)
@@ -1413,5 +1518,3 @@ def tag_address(addr:TagAddress) -> str:
     if isinstance(addr, tuple):
         return f"{addr[0]}, {addr[1]}"
     raise SyntaxError(f"Invalid address syntax: {addr}")
-
-

@@ -632,7 +632,7 @@ class EXPRESSION(Resource):
         return res
     
     def __eq__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self} == {str(o)}')
+        res = LITERAL(f'{self} == {deboolify(o)}')
         res.resources.add(self)
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -647,7 +647,7 @@ class EXPRESSION(Resource):
         return res
     
     def __ne__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self} <> {str(o)}')
+        res = LITERAL(f'{self} <> {deboolify(o)}')
         res.resources.add(self)
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -662,7 +662,7 @@ class EXPRESSION(Resource):
         return res
     
     def __lt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self} < {str(o)}')
+        res = LITERAL(f'{self} < {deboolify(o)}')
         res.resources.add(self)
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -677,7 +677,7 @@ class EXPRESSION(Resource):
         return res
     
     def __le__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self} <= {str(o)}')
+        res = LITERAL(f'{self} <= {deboolify(o)}')
         res.resources.add(self)
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -692,7 +692,7 @@ class EXPRESSION(Resource):
         return res
     
     def __gt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self} > {str(o)}')
+        res = LITERAL(f'{self} > {deboolify(o)}')
         res.resources.add(self)
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -707,7 +707,7 @@ class EXPRESSION(Resource):
         return res
     
     def __ge__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self} >= {str(o)}')
+        res = LITERAL(f'{self} >= {deboolify(o)}')
         res.resources.add(self)
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -945,7 +945,7 @@ class Variable(Resource, Generic[DT]):
         return res
     
     def __eq__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.name} == {str(o)}')
+        res = LITERAL(f'{self.name} == {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -960,7 +960,7 @@ class Variable(Resource, Generic[DT]):
         return res
     
     def __ne__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.name} <> {str(o)}')
+        res = LITERAL(f'{self.name} <> {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -975,7 +975,7 @@ class Variable(Resource, Generic[DT]):
         return res
     
     def __lt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.name} < {str(o)}')
+        res = LITERAL(f'{self.name} < {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -990,7 +990,7 @@ class Variable(Resource, Generic[DT]):
         return res
     
     def __le__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.name} <= {str(o)}')
+        res = LITERAL(f'{self.name} <= {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1005,7 +1005,7 @@ class Variable(Resource, Generic[DT]):
         return res
     
     def __gt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.name} > {str(o)}')
+        res = LITERAL(f'{self.name} > {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1020,7 +1020,7 @@ class Variable(Resource, Generic[DT]):
         return res
     
     def __ge__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.name} >= {str(o)}')
+        res = LITERAL(f'{self.name} >= {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1141,7 +1141,7 @@ class VariableItem(Resource, Generic[DT]):
         return res
     
     def __eq__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.array.name} == {str(o)}')
+        res = LITERAL(f'{self.array.name} == {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1156,7 +1156,7 @@ class VariableItem(Resource, Generic[DT]):
         return res
     
     def __ne__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.array.name} <> {str(o)}')
+        res = LITERAL(f'{self.array.name} <> {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1171,7 +1171,7 @@ class VariableItem(Resource, Generic[DT]):
         return res
     
     def __lt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.array.name} < {str(o)}')
+        res = LITERAL(f'{self.array.name} < {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1186,7 +1186,7 @@ class VariableItem(Resource, Generic[DT]):
         return res
     
     def __le__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.array.name} <= {str(o)}')
+        res = LITERAL(f'{self.array.name} <= {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1201,7 +1201,7 @@ class VariableItem(Resource, Generic[DT]):
         return res
     
     def __gt__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.array.name} > {str(o)}')
+        res = LITERAL(f'{self.array.name} > {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())
@@ -1216,7 +1216,7 @@ class VariableItem(Resource, Generic[DT]):
         return res
     
     def __ge__(self, o:Union[Variable, VariableItem, EXPRESSION]) -> LITERAL:
-        res = LITERAL(f'{self.array.name} >= {str(o)}')
+        res = LITERAL(f'{self.array.name} >= {deboolify(o)}')
         res.resources.add(self.as_literal())
         if isinstance(o, (Variable, VariableItem)):
             res.resources.add(o.as_literal())

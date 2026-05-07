@@ -62,7 +62,9 @@ def is_int(v:Union[DataType, str, Variable, VariableItem, Tag, int]) -> bool:
         }
     if isinstance(v, str):
         return "char" in v or "short" in v or "int" in v or "long" in v
-    if isinstance(v, (Variable, VariableItem)):
+    if isinstance(v, VariableItem):
+        return is_int(v.array.dtype)
+    if isinstance(v, Variable):
         return is_int(v.dtype)
     if isinstance(v, Tag):
         return is_int(v.dtype)
@@ -74,7 +76,9 @@ def is_float(v:Union[DataType, str, Variable, VariableItem, Tag, float]) -> bool
         return v in {DataType.F32, DataType.F64}
     if isinstance(v, str):
         return "float" in v or "double" in v
-    if isinstance(v, (Variable, VariableItem)):
+    if isinstance(v, VariableItem):
+        return is_float(v.array.dtype)
+    if isinstance(v, Variable):
         return is_float(v.dtype)
     if isinstance(v, Tag):
         return is_float(v.dtype)

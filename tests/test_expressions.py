@@ -57,19 +57,49 @@ def test_variable_eq_uses_eb_inequality_operator():
     assert "!=" not in rendered
 
 
-@pytest.mark.xfail(
-    reason=(
-        "Variable.__eq__ uses @overload as if it were a runtime dispatcher; "
-        "the @overload-decorated stub is never called, so bool literals are "
-        "stringified directly instead of going through deboolify. Tracked as "
-        "a follow-up — see also __ne__/__lt__/__le__/__gt__/__ge__."
-    ),
-    strict=True,
-)
 def test_variable_eq_against_bool_is_normalized_to_int():
     a = vbool("a")
     assert str(a == True) == "a == 1"   # noqa: E712 -- testing operator overload
     assert str(a == False) == "a == 0"  # noqa: E712
+
+
+def test_variable_all_comparison_ops_normalize_bool_literals():
+    a = vbool("a")
+    assert str(a != True) == "a <> 1"   # noqa: E712
+    assert str(a < True) == "a < 1"     # noqa: E712
+    assert str(a <= False) == "a <= 0"  # noqa: E712
+    assert str(a > True) == "a > 1"     # noqa: E712
+    assert str(a >= False) == "a >= 0"  # noqa: E712
+
+
+@pytest.mark.xfail(
+    reason=(
+        "VariableItem.__eq__/__ne__/__lt__/__le__/__gt__/__ge__ render with "
+        "{self.array.name} instead of {self}, so the [index] is dropped. "
+        "Tracked as a follow-up — VariableItem arithmetic ops correctly "
+        "include the index (see test_reverse_operators_variable_item)."
+    ),
+    strict=True,
+)
+def test_variable_item_comparison_includes_index():
+    item = vint_arr("arr", 3)[0]
+    assert str(item == 1) == "arr[0] == 1"
+    assert str(item == True) == "arr[0] == 1"  # noqa: E712
+
+
+def test_variable_item_comparison_normalizes_bool():
+    """The deboolify fix applies here even though the index is dropped — the
+    bool literal still becomes 0/1 instead of True/False."""
+    item = vint_arr("arr", 3)[0]
+    rendered = str(item == True)  # noqa: E712
+    assert rendered.endswith("== 1")
+    assert "True" not in rendered
+
+
+def test_expression_comparison_ops_normalize_bool_literals():
+    expr = EVAL("FN", 1)
+    assert str(expr == True) == "FN(1) == 1"   # noqa: E712
+    assert str(expr != False) == "FN(1) <> 0"  # noqa: E712
 
 
 # ---------- forward arithmetic operators ------------------------------------

@@ -1,6 +1,4 @@
 """Tests for the ``is_int`` and ``is_float`` type predicates."""
-import pytest
-
 from eb_macro_gen.objects import DataType, Tag, is_float, is_int
 from eb_macro_gen.syntax import vfloat, vint, vint_arr
 
@@ -62,17 +60,10 @@ def test_is_float_on_float_variable():
     assert not is_int(vfloat("f"))
 
 
-@pytest.mark.xfail(
-    reason=(
-        "is_int(VariableItem) crashes with AttributeError: VariableItem has no "
-        ".dtype, only .array.dtype. Tracked as a follow-up."
-    ),
-    strict=True,
-    raises=AttributeError,
-)
 def test_is_int_on_integer_variable_item():
     arr = vint_arr("xs", 3)
     assert is_int(arr[0])
+    assert not is_float(arr[0])
 
 
 def test_is_int_on_integer_tag():

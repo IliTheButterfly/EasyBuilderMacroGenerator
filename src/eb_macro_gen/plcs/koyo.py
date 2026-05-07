@@ -7,7 +7,7 @@ except ImportError:
     from typing_extensions import override
 from dataclasses import dataclass
 from eb_macro_gen.common import DoubleKeyMap, smart_split
-from eb_macro_gen.objects import DT_EB_MAP, EB_DT_MAP, Tag, TagList
+from eb_macro_gen.objects import EB_DT_MAP, Tag, TagList
 
 KOYO_EB_TYPE_MAP:Dict[str, str] = {
     "BIT" : "",

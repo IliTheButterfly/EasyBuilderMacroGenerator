@@ -25,6 +25,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8",
+  "ruff>=0.6",
 ]
 
 [project.scripts]
@@ -45,3 +46,24 @@ Issues = "https://github.com/IliTheButterfly/EasyBuilderMacroGnerator/issues"
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+extend-exclude = ["examples", "temp", "dist"]
+
+[tool.ruff.lint]
+# Bug-catching ruleset, not style. Wildcard-import rules (F403/F405) are
+# disabled until the public API is migrated off `from .X import *`.
+select = [
+  "F401",  # unused-import
+  "F601",  # multi-value-repeated-key-literal
+  "F811",  # redefined-while-unused
+  "F841",  # unused-variable
+  "E711",  # comparison-to-none
+  "E712",  # comparison-to-bool
+  "E713",  # not-in
+  "E714",  # not-is
+  "E722",  # bare-except
+  "W605",  # invalid-escape-sequence
+]

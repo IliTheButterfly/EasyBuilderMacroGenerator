@@ -1,77 +1,63 @@
 from enum import Enum
-from typing import Generic, Hashable, List, Optional, TypeVar, Union
+from typing import Dict, Generic, Hashable, Iterator, List, Optional, Tuple, TypeVar
 
 TK1_ = TypeVar("TK1_", bound=Hashable)
 TK2_ = TypeVar("TK2_", bound=Hashable)
 TV_ = TypeVar("TV_")
 
+
 class DoubleKeyMap(Generic[TK1_, TK2_, TV_]):
-    def __init__(self):
-        self.keys1:List[TK1_] = list()
-        self.keys2:List[TK2_] = list()
-        self.values:List[TV_] = list()
-        
-    def add(self, key1:TK1_, key2:TK2_, value:TV_) -> bool:
-        if key1 in self.keys1:
+    """Bidirectional 1:1 map between two key spaces sharing a value.
+
+    Both keys must be unique; ``add`` returns False if either collides.
+    Lookups and removals are O(1) (dict-backed, equality-based).
+    """
+
+    def __init__(self) -> None:
+        self._by_k1: Dict[TK1_, Tuple[TK2_, TV_]] = {}
+        self._k2_to_k1: Dict[TK2_, TK1_] = {}
+
+    def add(self, key1: TK1_, key2: TK2_, value: TV_) -> bool:
+        if key1 in self._by_k1 or key2 in self._k2_to_k1:
             return False
-        if key2 in self.keys2:
-            return False
-        self.keys1.append(key1)
-        self.keys2.append(key2)
-        self.values.append(value)
+        self._by_k1[key1] = (key2, value)
+        self._k2_to_k1[key2] = key1
         return True
-        
-    def remove_from_key1(self, key:TK1_):
-        kh = hash(key)
-        idx = None
-        for i, k in enumerate(self.keys1):
-            if hash(k) == kh:
-                idx = i
-                break
-            
-        if idx is not None:
-            del self.keys1[idx]
-            del self.keys2[idx]
-            del self.values[idx]
-            
-    def remove_from_key2(self, key:TK2_):
-        kh = hash(key)
-        idx = None
-        for i, k in enumerate(self.keys2):
-            if hash(k) == kh:
-                idx = i
-                break
-            
-        if idx is not None:
-            del self.keys1[idx]
-            del self.keys2[idx]
-            del self.values[idx]
-        
-    def get_from_key1(self, key:TK1_) -> Optional[TV_]:
-        kh = hash(key)
-        for i, k in enumerate(self.keys1):
-            if hash(k) == kh:
-                return self.values[i]
-        return None
-    
-    def get_from_key2(self, key:TK2_) -> Optional[TV_]:
-        kh = hash(key)
-        for i, k in enumerate(self.keys2):
-            if hash(k) == kh:
-                return self.values[i]
-        return None
-        
+
+    def remove_from_key1(self, key: TK1_) -> None:
+        entry = self._by_k1.pop(key, None)
+        if entry is not None:
+            self._k2_to_k1.pop(entry[0], None)
+
+    def remove_from_key2(self, key: TK2_) -> None:
+        key1 = self._k2_to_k1.pop(key, None)
+        if key1 is not None:
+            self._by_k1.pop(key1, None)
+
+    def get_from_key1(self, key: TK1_) -> Optional[TV_]:
+        entry = self._by_k1.get(key)
+        return entry[1] if entry is not None else None
+
+    def get_from_key2(self, key: TK2_) -> Optional[TV_]:
+        key1 = self._k2_to_k1.get(key)
+        if key1 is None:
+            return None
+        return self._by_k1[key1][1]
+
     def __len__(self) -> int:
-        return len(self.values)
-    
-    def __iter__(self):
-        return zip(self.keys1, self.keys2, self.values)
-    
-    def __contains__(self, obj) -> bool:
-        return obj in self.keys1 or obj in self.keys2 or obj in self.values
+        return len(self._by_k1)
+
+    def __iter__(self) -> Iterator[Tuple[TK1_, TK2_, TV_]]:
+        for k1, (k2, v) in self._by_k1.items():
+            yield (k1, k2, v)
+
+    def __contains__(self, obj: object) -> bool:
+        if obj in self._by_k1 or obj in self._k2_to_k1:
+            return True
+        return any(v == obj for _, v in self._by_k1.values())
 
 
-def smart_split(text: str, sep: str = ',') -> list[str]:
+def smart_split(text: str, sep: str = ',') -> List[str]:
     parts:List[str] = []
     current:List[str] = []
     in_quotes = False

@@ -2,12 +2,7 @@ from __future__ import annotations
 from enum import Enum
 from collections import deque
 from itertools import repeat
-from typing import IO, Any, Callable, Generic, List, Literal, Optional, Set, TextIO, Tuple, TypeVar, Union, overload
-
-try:
-    from typing import TypeAlias
-except ImportError:
-    from typing_extensions import TypeAlias
+from typing import Any, Callable, Generic, List, Literal, Optional, Set, TextIO, Tuple, TypeVar, Union, overload
 
 DT = TypeVar('DT')
 
@@ -44,7 +39,7 @@ class Resource:
             macro (Macro): The containing macro
         """
         for r in self.resources:
-            if isinstance(r, Resource) and not r.__class__ is Resource:
+            if isinstance(r, Resource) and r.__class__ is not Resource:
                 r.process(macro)
                 
     def __hash__(self) -> int:
@@ -719,15 +714,6 @@ class EXPRESSION(Resource):
         elif isinstance(o, Resource):
             res.resources.add(o)
         return res
-    
-    def __and__(self, o:Union[EXPRESSION, Variable[bool], VariableItem[bool]]) -> AND:
-        return AND(self, deboolify(o))
-    
-    def __or__(self, o:Union[EXPRESSION, Variable[bool], VariableItem[bool]]) -> OR:
-        return OR(self, deboolify(o))
-    
-    def __invert__(self) -> NOT:
-        return NOT(self)
     
     def __sub__(self, o) -> LITERAL:
         res = LITERAL(f'{str(self)} - {str(deboolify(o))}')

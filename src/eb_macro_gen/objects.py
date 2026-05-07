@@ -32,7 +32,7 @@ DT_EB_MAP:Dict[DataType, str] = {
     DataType.U16 : "16-bit Unsigned",
     DataType.S16 : "16-bit Signed",
     DataType.U32 : "32-bit Unsigned",
-    DataType.S32 : "16-bit Signed",
+    DataType.S32 : "32-bit Signed",
     DataType.F32 : "32-bit Float",
 }
 
@@ -44,7 +44,7 @@ EB_DT_MAP:Dict[str, DataType] = {
     "16-bit Unsigned" : DataType.U16,
     "16-bit Signed" : DataType.S16,
     "32-bit Unsigned" : DataType.U32,
-    "16-bit Signed" : DataType.S32,
+    "32-bit Signed" : DataType.S32,
     "32-bit Float" : DataType.F32,
 }
     
@@ -108,15 +108,12 @@ class Tag(Resource):
     def address_num(self) -> Optional[int]:
         try:
             return int(self.address.split(',')[1])
-        except:
+        except (IndexError, ValueError):
             return None
-        
+
     @property
     def address_register(self) -> str:
-        try:
-            return self.address.split(',')[0]
-        except:
-            return None
+        return self.address.split(',')[0]
     
     def __hash__(self) -> int:
         return hash(f"{self.device_name}/{self.address}")
